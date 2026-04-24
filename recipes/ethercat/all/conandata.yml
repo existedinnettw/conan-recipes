@@ -1,7 +1,37 @@
 sources:
+  "1.5.2":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.5.2/ethercat-1.5.2.tar.gz"
+    sha256: "c266f143b01ea6c618b54d85068e90662c25c56a7888fad1e0eafccf03388ceb"
   "1.5.3":
     url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.5.3/ethercat-1.5.3.tar.gz"
     sha256: "69f6fdee37cfd8bb87834e975b80092b055ea2debf7d31591d43237f6bddc31b"
+  "1.6.0":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.0/ethercat-1.6.0.tar.gz"
+    sha256: "4ba94386c47461b084a57ad177293210ce3bb9b9ebcdf34428caebd0c9a1f5f0"
+  "1.6.1":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.1/ethercat-1.6.1.tar.gz"
+    sha256: "0ca68e064778d50259dfdb701fd19b088bd3de8d0ac826963b251892112d28f9"
+  "1.6.2":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.2/ethercat-1.6.2.tar.gz"
+    sha256: "844e9846a30b8bed0ae7f1e9a70b724b8980a21ef61c2bdf8fa219c9745c1958"
+  "1.6.3":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.3/ethercat-1.6.3.tar.gz"
+    sha256: "c85e84ec4b0c59cb3f019399640a2b9c4f4561e946cb762a8fc896ef5ba9508d"
+  "1.6.4":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.4/ethercat-1.6.4.tar.gz"
+    sha256: "3b9343abd862e4fd52d700c95173579329de87dbebbe767413c5de83886743d2"
+  "1.6.5":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.5/ethercat-1.6.5.tar.gz"
+    sha256: "57d01fe538fe641780754dfd824dfaa6aec860562fb85037897e4c8901aa5950"
+  "1.6.6":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.6/ethercat-1.6.6.tar.gz"
+    sha256: "86c4d9431446c9da2361167704d01e7a93b07be364b1fb4a908d205914d74ea8"
+  "1.6.7":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.7/ethercat-1.6.7.tar.gz"
+    sha256: "f6df9e6324bd689fb7ad9c4a3036e10e4779441fef0f06b1e502984c8792cf37"
   "1.6.8":
     url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.8/ethercat-1.6.8.tar.gz"
     sha256: "c6d800ff1a9756b7c19078ac2c480a83d67934e0ed0cc8bde3a3f8770f7b88f4"
+  "1.6.9":
+    url: "https://gitlab.com/etherlab.org/ethercat/-/archive/1.6.9/ethercat-1.6.9.tar.gz"
+    sha256: "2bc4d6b69ed980b896ecae9ea6603b327562dfacd3b8c1ed4e9e599a4cc4dfc3"

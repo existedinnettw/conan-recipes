@@ -25,8 +25,11 @@ set(ETHERCAT_SOURCES
     lib/reg_request.c
     lib/sdo_request.c
     lib/slave_config.c
-    lib/soe_request.c
     lib/voe_handler.c)
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/soe_request.c")
+  list(APPEND ETHERCAT_SOURCES lib/soe_request.c)
+endif()
 
 set(ETHERCAT_PUBLIC_HEADERS
     include/ecrt.h
