@@ -141,3 +141,12 @@ venv.bak/
 Session.vim
 *~
 .undodir
+
+/.*
+!/.gitignore
+!/.editorconfig
+!/.gitattributes
+!/.github
+!/.vscode
+/.env*
+!/.env*.example
