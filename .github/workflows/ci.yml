@@ -18,7 +18,7 @@ jobs:
       has_targets: ${{ steps.detect.outputs.has_targets }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -56,19 +56,14 @@ jobs:
       matrix: ${{ fromJson(needs.detect-targets.outputs.matrix) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install host build tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential \
-            gcc-14 \
-            g++-14 \
-            cmake \
-            ninja-build \
-            graphviz \
-            crudini
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: build-essential gcc-14 g++-14 cmake ninja-build graphviz crudini
+          version: 1.0
+          execute_install_scripts: true
 
       - name: Set gcc-14 as default
         run: |

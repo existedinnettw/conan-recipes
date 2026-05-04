@@ -5,8 +5,8 @@ from conan.tools.files import copy, get
 import os
 
 
-class EthercatConan(ConanFile):
-    name = "ethercat"
+class IghEthercatConan(ConanFile):
+    name = "igh-ethercat"
     license = "LGPL-2.1-only"
     author = "Florian Pose <fp@igh.de>"
     url = "https://gitlab.com/etherlab.org/ethercat"
