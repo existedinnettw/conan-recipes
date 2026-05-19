@@ -150,3 +150,4 @@ Session.vim
 !/.vscode
 /.env*
 !/.env*.example
+**/test_package/bin

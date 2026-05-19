@@ -21,6 +21,8 @@ class TestPackageConan(ConanFile):
         cmake.build()
 
     def test(self):
+        cmake = CMake(self)
+        cmake.install()
         if can_run(self):
-            exe = os.path.join(self.cpp.build.bindirs[0], "test_package")
+            exe = os.path.join(self.source_folder, "bin", "test_package")
             self.run(exe, env="conanrun")
