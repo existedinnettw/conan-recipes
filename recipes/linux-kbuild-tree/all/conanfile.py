@@ -6,7 +6,7 @@ import subprocess
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import cross_building
-from conan.tools.files import copy, save
+from conan.tools.files import copy, get, save
 
 
 class LinuxKbuildTreeConan(ConanFile):
@@ -22,8 +22,8 @@ class LinuxKbuildTreeConan(ConanFile):
     }
 
     default_options = {
-        "url": "https://github.com/torvalds/linux.git",
-        "defconfig": "",
+        "url": "",
+        "defconfig": "defconfig",
         "make_modules": False,
     }
 
@@ -57,10 +57,13 @@ class LinuxKbuildTreeConan(ConanFile):
             )
 
     def source(self):
-        self.run(
-            "git clone --depth=1 "
-            f"--branch {shlex.quote(self._linux_ref_from_version())} "
-            "https://github.com/torvalds/linux.git linux"
+        source_url, sha256 = self._linux_source()
+        get(
+            self,
+            source_url,
+            sha256=sha256,
+            destination=os.path.join(self.source_folder, "linux"),
+            strip_root=True,
         )
 
     def build(self):
@@ -87,16 +90,16 @@ class LinuxKbuildTreeConan(ConanFile):
 
         kernelrelease = self._capture(f"{make_base} kernelrelease")
         compiler = self._capture(f"{self._cross_gcc} --version").splitlines()[0]
-        git_commit = self._capture(f"git -C {shlex.quote(linux)} rev-parse HEAD")
+        source_url, sha256 = self._linux_source()
 
         save(
             self,
             os.path.join(self.build_folder, "kbuild-tree-info.txt"),
             "\n".join(
                 [
-                    f"url={self.options.url}",
+                    f"url={source_url}",
                     f"ref={self._linux_ref_from_version()}",
-                    f"git_commit={git_commit}",
+                    f"sha256={sha256 or ''}",
                     f"kernelrelease={kernelrelease}",
                     f"arch={arch}",
                     f"cross_compile={cross_compile}",
@@ -130,6 +133,25 @@ class LinuxKbuildTreeConan(ConanFile):
         if len(version_parts) == 3 and version_parts[2] == "0":
             return f"v{version_parts[0]}.{version_parts[1]}"
         return f"v{self.version}"
+
+    def _linux_archive_version(self):
+        version_parts = str(self.version).split(".")
+        if len(version_parts) == 3 and version_parts[2] == "0":
+            return f"{version_parts[0]}.{version_parts[1]}"
+        return str(self.version)
+
+    def _linux_source(self):
+        source = self.conan_data.get("sources", {}).get(str(self.version)) or {}
+        source_url = source.get("url") or self._kernel_cdn_url()
+        return source_url, source.get("sha256")
+
+    def _kernel_cdn_url(self):
+        archive_version = self._linux_archive_version()
+        major = archive_version.split(".", 1)[0]
+        return (
+            f"https://cdn.kernel.org/pub/linux/kernel/v{major}.x/"
+            f"linux-{archive_version}.tar.gz"
+        )
 
     @property
     def _kernel_arch(self):
