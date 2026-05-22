@@ -76,7 +76,8 @@ class LinuxKbuildTreeConan(ConanFile):
         make_base = (
             f"make --no-print-directory -C {shlex.quote(linux)}{make_jobs} "
             f"ARCH={shlex.quote(str(arch))} "
-            f"CROSS_COMPILE={shlex.quote(str(cross_compile))}"
+            f"CROSS_COMPILE={shlex.quote(str(cross_compile))} "
+            f"{self._host_warning_flags_args}"
         )
 
         self._install_config(linux, make_base)
@@ -152,6 +153,52 @@ class LinuxKbuildTreeConan(ConanFile):
             f"https://cdn.kernel.org/pub/linux/kernel/v{major}.x/"
             f"linux-{archive_version}.tar.gz"
         )
+
+    @property
+    def _host_warning_flags_args(self):
+        hostcflags = []
+
+        if self._version_lt("5.16.0") and self._host_compiler_accepts(
+            "-Wno-error=use-after-free"
+        ):
+            # Older objtool builds use -Werror and trip GCC 14's realloc(ptr)
+            # use-after-free diagnostic in tools/lib/subcmd/subcmd-util.h.
+            hostcflags.append("-Wno-error=use-after-free")
+
+        if not hostcflags:
+            return ""
+
+        flags = shlex.quote(" ".join(hostcflags))
+        return f"HOSTCFLAGS={flags} EXTRA_CFLAGS={flags}"
+
+    def _host_compiler_accepts(self, flag):
+        try:
+            subprocess.run(
+                [
+                    "gcc",
+                    flag,
+                    "-x",
+                    "c",
+                    "-c",
+                    "-o",
+                    os.devnull,
+                    "-",
+                ],
+                input="int main(void) { return 0; }\n",
+                text=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
+        except (OSError, subprocess.CalledProcessError):
+            return False
+        return True
+
+    def _version_lt(self, other):
+        return self._version_tuple(str(self.version)) < self._version_tuple(other)
+
+    def _version_tuple(self, version):
+        return tuple(int(part) for part in version.split("."))
 
     @property
     def _kernel_arch(self):
