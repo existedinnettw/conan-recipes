@@ -1,0 +1,311 @@
+import os
+import re
+import shlex
+import subprocess
+
+from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
+from conan.tools.build import cross_building
+from conan.tools.files import copy, get, save
+
+
+class LinuxKbuildTreeConan(ConanFile):
+    name = "linux-kbuild-tree"
+    package_type = "application"
+
+    settings = "os", "arch", "compiler", "build_type"
+
+    options = {
+        "url": ["ANY"],
+        "defconfig": ["ANY"],
+        "make_modules": [True, False],
+    }
+
+    default_options = {
+        "url": "",
+        "defconfig": "defconfig",
+        "make_modules": False,
+    }
+
+    exports_sources = "configs/*"
+
+    def layout(self):
+        self.folders.build = "build"
+        self.folders.generators = os.path.join(self.folders.build, "generators")
+
+    def package_id(self):
+        c_compiler = self._compiler_executable("c")
+        if c_compiler is not None:
+            self.info.conf.define("tools.build:compiler_executables", {"c": str(c_compiler)})
+
+    def validate(self):
+        if self.settings.os != "Linux":
+            raise ConanInvalidConfiguration("linux-kbuild-tree requires a Linux target")
+
+        if not self.version:
+            raise ConanInvalidConfiguration(
+                "linux-kbuild-tree requires a package version, e.g. "
+                "conan create recipes/linux-kbuild-tree --version=6.5.9"
+            )
+
+        self._kernel_arch
+
+        if cross_building(self) and self._cross_compile is None:
+            raise ConanInvalidConfiguration(
+                "Cross-building a kernel tree requires "
+                "tools.build:compiler_executables with a GCC-like C compiler"
+            )
+
+    def source(self):
+        source_url, sha256 = self._linux_source()
+        get(
+            self,
+            source_url,
+            sha256=sha256,
+            destination=os.path.join(self.source_folder, "linux"),
+            strip_root=True,
+        )
+
+    def build(self):
+        linux = os.path.join(self.source_folder, "linux")
+        arch = self._kernel_arch
+        cross_compile = self._cross_compile or ""
+        jobs = self.conf.get("tools.build:jobs", default=None)
+        make_jobs = f" -j{jobs}" if jobs else ""
+
+        make_base = (
+            f"make --no-print-directory -C {shlex.quote(linux)}{make_jobs} "
+            f"ARCH={shlex.quote(str(arch))} "
+            f"CROSS_COMPILE={shlex.quote(str(cross_compile))} "
+            f"{self._host_warning_flags_args}"
+        )
+
+        self._install_config(linux, make_base)
+
+        self.run(f"{make_base} olddefconfig prepare modules_prepare")
+
+        if self.options.make_modules:
+            # Required when CONFIG_MODVERSIONS=y and the target kernel exports
+            # symbols that are not available from a vendor-provided Module.symvers.
+            self.run(f"{make_base} modules")
+
+        kernelrelease = self._capture(f"{make_base} kernelrelease")
+        compiler = self._capture(f"{self._cross_gcc} --version").splitlines()[0]
+        source_url, sha256 = self._linux_source()
+
+        save(
+            self,
+            os.path.join(self.build_folder, "kbuild-tree-info.txt"),
+            "\n".join(
+                [
+                    f"url={source_url}",
+                    f"ref={self._linux_ref_from_version()}",
+                    f"sha256={sha256 or ''}",
+                    f"kernelrelease={kernelrelease}",
+                    f"arch={arch}",
+                    f"cross_compile={cross_compile}",
+                    f"compiler={compiler}",
+                    f"make_modules={self.options.make_modules}",
+                    "",
+                ]
+            ),
+        )
+
+    def package(self):
+        linux = os.path.join(self.source_folder, "linux")
+
+        # External module builds need source files, generated headers, scripts,
+        # .config, and often Module.symvers. Packaging the whole prepared tree is
+        # intentionally conservative and can be optimized after the flow is stable.
+        copy(self, "*", src=linux, dst=self.package_folder, excludes=(".git", ".git/*"))
+        copy(self, ".config", src=linux, dst=self.package_folder, keep_path=False)
+        copy(
+            self,
+            "kbuild-tree-info.txt",
+            src=self.build_folder,
+            dst=self.package_folder,
+            keep_path=False,
+        )
+
+    def _linux_ref_from_version(self):
+        # Upstream Linux tags base releases as v6.8, while the kernel release
+        # and Conan package version are commonly represented as 6.8.0.
+        version_parts = str(self.version).split(".")
+        if len(version_parts) == 3 and version_parts[2] == "0":
+            return f"v{version_parts[0]}.{version_parts[1]}"
+        return f"v{self.version}"
+
+    def _linux_archive_version(self):
+        version_parts = str(self.version).split(".")
+        if len(version_parts) == 3 and version_parts[2] == "0":
+            return f"{version_parts[0]}.{version_parts[1]}"
+        return str(self.version)
+
+    def _linux_source(self):
+        source = self.conan_data.get("sources", {}).get(str(self.version)) or {}
+        source_url = source.get("url") or self._kernel_cdn_url()
+        return source_url, source.get("sha256")
+
+    def _kernel_cdn_url(self):
+        archive_version = self._linux_archive_version()
+        major = archive_version.split(".", 1)[0]
+        return (
+            f"https://cdn.kernel.org/pub/linux/kernel/v{major}.x/"
+            f"linux-{archive_version}.tar.gz"
+        )
+
+    @property
+    def _host_warning_flags_args(self):
+        hostcflags = []
+
+        if self._version_lt("5.16.0") and self._host_compiler_accepts(
+            "-Wno-error=use-after-free"
+        ):
+            # Older objtool builds use -Werror and trip GCC 14's realloc(ptr)
+            # use-after-free diagnostic in tools/lib/subcmd/subcmd-util.h.
+            hostcflags.append("-Wno-error=use-after-free")
+
+        if not hostcflags:
+            return ""
+
+        flags = shlex.quote(" ".join(hostcflags))
+        return f"HOSTCFLAGS={flags} EXTRA_CFLAGS={flags}"
+
+    def _host_compiler_accepts(self, flag):
+        try:
+            subprocess.run(
+                [
+                    "gcc",
+                    flag,
+                    "-x",
+                    "c",
+                    "-c",
+                    "-o",
+                    os.devnull,
+                    "-",
+                ],
+                input="int main(void) { return 0; }\n",
+                text=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
+        except (OSError, subprocess.CalledProcessError):
+            return False
+        return True
+
+    def _version_lt(self, other):
+        return self._version_tuple(str(self.version)) < self._version_tuple(other)
+
+    def _version_tuple(self, version):
+        return tuple(int(part) for part in version.split("."))
+
+    @property
+    def _kernel_arch(self):
+        arch = str(self.settings.arch)
+        arch_map = {
+            "x86": "x86",
+            "x86_64": "x86",
+            "armv5el": "arm",
+            "armv5hf": "arm",
+            "armv6": "arm",
+            "armv7": "arm",
+            "armv7hf": "arm",
+            "armv8": "arm64",
+            "armv8_32": "arm",
+            "armv8.3": "arm64",
+            "armv8.5": "arm64",
+            "armv8.6": "arm64",
+            "armv8.7": "arm64",
+            "armv8.8": "arm64",
+            "armv8.9": "arm64",
+            "ppc32": "powerpc",
+            "ppc64": "powerpc",
+            "ppc64le": "powerpc",
+            "riscv32": "riscv",
+            "riscv64": "riscv",
+            "s390": "s390",
+            "s390x": "s390",
+            "sparc": "sparc",
+            "sparcv9": "sparc",
+            "mips": "mips",
+            "mips64": "mips",
+        }
+        if arch not in arch_map:
+            raise ConanInvalidConfiguration(
+                f"Cannot derive Linux ARCH from settings.arch={arch!r}; "
+                "add this Conan architecture to the recipe arch map"
+            )
+        return arch_map[arch]
+
+    @property
+    def _cross_compile(self):
+        if not cross_building(self):
+            return ""
+
+        c_compiler = self._compiler_executable("c")
+        if not c_compiler:
+            return None
+
+        return self._cross_compile_from_executable(c_compiler)
+
+    def _cross_compile_from_compiler_executables(self):
+        c_compiler = self._compiler_executable("c")
+        if not c_compiler:
+            return None
+        return self._cross_compile_from_executable(c_compiler)
+
+    def _cross_compile_from_executable(self, c_compiler):
+        executable = os.path.basename(c_compiler)
+        match = re.match(r"^(.+?)(?:gcc|cc)(?:-\d+(?:\.\d+)*)?$", executable)
+        if not match:
+            return None
+        return match.group(1)
+
+    @property
+    def _cross_gcc(self):
+        cross_compile = self._cross_compile or ""
+        return shlex.quote(f"{cross_compile}gcc")
+
+    def _compiler_executable(self, language):
+        executables = self.conf.get("tools.build:compiler_executables", default={})
+        if not executables:
+            return None
+        if hasattr(executables, "get"):
+            return executables.get(language)
+        return None
+
+    def _install_config(self, linux, make_base):
+        defconfig = str(self.options.defconfig)
+        if not defconfig:
+            if not os.path.exists(os.path.join(linux, ".config")):
+                raise ConanInvalidConfiguration(
+                    "Missing kernel config: set linux-kbuild-tree/*:defconfig "
+                    "or provide a source tree with .config"
+                )
+            return
+
+        exported_config = os.path.join(self.source_folder, "configs", defconfig)
+        if os.path.isfile(exported_config):
+            copy(
+                self,
+                defconfig,
+                src=os.path.dirname(exported_config),
+                dst=linux,
+                keep_path=False,
+            )
+            os.replace(os.path.join(linux, defconfig), os.path.join(linux, ".config"))
+            return
+
+        self.run(f"{make_base} {shlex.quote(defconfig)}")
+
+    def _capture(self, command):
+        output = subprocess.check_output(
+            command,
+            shell=True,
+            stderr=subprocess.STDOUT,
+            text=True,
+        ).strip()
+        if not output:
+            raise ConanInvalidConfiguration(f"Command produced no output: {command}")
+        return output
