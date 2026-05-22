@@ -11,7 +11,9 @@ from conan.tools.files import copy, get, save
 
 class LinuxKbuildTreeConan(ConanFile):
     name = "linux-kbuild-tree"
-    package_type = "application"
+    package_type = "unknown"
+    upload_policy = "skip"
+    build_policy = "missing"
 
     settings = "os", "arch", "compiler", "build_type"
 
@@ -126,6 +128,11 @@ class LinuxKbuildTreeConan(ConanFile):
             dst=self.package_folder,
             keep_path=False,
         )
+
+    def package_info(self):
+        self.cpp_info.includedirs = []
+        self.cpp_info.libdirs = []
+        self.cpp_info.bindirs = []
 
     def _linux_ref_from_version(self):
         # Upstream Linux tags base releases as v6.8, while the kernel release
