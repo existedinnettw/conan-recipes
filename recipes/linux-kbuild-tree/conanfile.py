@@ -34,15 +34,9 @@ class LinuxKbuildTreeConan(ConanFile):
         self.folders.generators = os.path.join(self.folders.build, "generators")
 
     def package_id(self):
-        arch = self.conf.get("user.kernel:arch", default=None)
-        if arch:
-            self.info.conf.define("user.kernel:arch", str(arch))
-
-        cross_compile = self.conf.get("user.kernel:cross_compile", default=None)
-        if cross_compile is None:
-            cross_compile = self._cross_compile_from_compiler_executables()
-        if cross_compile is not None:
-            self.info.conf.define("user.kernel:cross_compile", str(cross_compile))
+        c_compiler = self._compiler_executable("c")
+        if c_compiler is not None:
+            self.info.conf.define("tools.build:compiler_executables", {"c": str(c_compiler)})
 
     def validate(self):
         if self.settings.os != "Linux":
@@ -58,8 +52,8 @@ class LinuxKbuildTreeConan(ConanFile):
 
         if cross_building(self) and self._cross_compile is None:
             raise ConanInvalidConfiguration(
-                "Cross-building a kernel tree requires user.kernel:cross_compile "
-                "or tools.build:compiler_executables with a GCC-like C compiler"
+                "Cross-building a kernel tree requires "
+                "tools.build:compiler_executables with a GCC-like C compiler"
             )
 
     def source(self):
@@ -129,11 +123,6 @@ class LinuxKbuildTreeConan(ConanFile):
             keep_path=False,
         )
 
-    def package_info(self):
-        self.conf_info.define("user.kernel:kernel_dir", self.package_folder)
-        self.conf_info.define("user.kernel:arch", self._kernel_arch)
-        self.conf_info.define("user.kernel:cross_compile", self._cross_compile or "")
-
     def _linux_ref_from_version(self):
         # Upstream Linux tags base releases as v6.8, while the kernel release
         # and Conan package version are commonly represented as 6.8.0.
@@ -144,10 +133,6 @@ class LinuxKbuildTreeConan(ConanFile):
 
     @property
     def _kernel_arch(self):
-        arch = self.conf.get("user.kernel:arch", default=None)
-        if arch:
-            return str(arch)
-
         arch = str(self.settings.arch)
         arch_map = {
             "x86": "x86",
@@ -180,16 +165,12 @@ class LinuxKbuildTreeConan(ConanFile):
         if arch not in arch_map:
             raise ConanInvalidConfiguration(
                 f"Cannot derive Linux ARCH from settings.arch={arch!r}; "
-                "set user.kernel:arch explicitly"
+                "add this Conan architecture to the recipe arch map"
             )
         return arch_map[arch]
 
     @property
     def _cross_compile(self):
-        cross_compile = self.conf.get("user.kernel:cross_compile", default=None)
-        if cross_compile is not None:
-            return str(cross_compile)
-
         if not cross_building(self):
             return ""
 
