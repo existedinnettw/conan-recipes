@@ -29,6 +29,10 @@ class LinuxKbuildTreeConan(ConanFile):
 
     exports_sources = "configs/*"
 
+    def layout(self):
+        self.folders.build = "build"
+        self.folders.generators = os.path.join(self.folders.build, "generators")
+
     def package_id(self):
         arch = self.conf.get("user.kernel:arch", default=None)
         if arch:
@@ -61,8 +65,8 @@ class LinuxKbuildTreeConan(ConanFile):
     def source(self):
         self.run(
             "git clone --depth=1 "
-            f"--branch {shlex.quote(self._source_ref)} "
-            f"{shlex.quote(str(self.options.url))} linux"
+            f"--branch {shlex.quote(self._linux_ref_from_version())} "
+            "https://github.com/torvalds/linux.git linux"
         )
 
     def build(self):
@@ -73,7 +77,7 @@ class LinuxKbuildTreeConan(ConanFile):
         make_jobs = f" -j{jobs}" if jobs else ""
 
         make_base = (
-            f"make -C {shlex.quote(linux)}{make_jobs} "
+            f"make --no-print-directory -C {shlex.quote(linux)}{make_jobs} "
             f"ARCH={shlex.quote(str(arch))} "
             f"CROSS_COMPILE={shlex.quote(str(cross_compile))}"
         )
@@ -97,7 +101,7 @@ class LinuxKbuildTreeConan(ConanFile):
             "\n".join(
                 [
                     f"url={self.options.url}",
-                    f"ref={self.version}",
+                    f"ref={self._linux_ref_from_version()}",
                     f"git_commit={git_commit}",
                     f"kernelrelease={kernelrelease}",
                     f"arch={arch}",
@@ -129,6 +133,14 @@ class LinuxKbuildTreeConan(ConanFile):
         self.conf_info.define("user.kernel:kernel_dir", self.package_folder)
         self.conf_info.define("user.kernel:arch", self._kernel_arch)
         self.conf_info.define("user.kernel:cross_compile", self._cross_compile or "")
+
+    def _linux_ref_from_version(self):
+        # Upstream Linux tags base releases as v6.8, while the kernel release
+        # and Conan package version are commonly represented as 6.8.0.
+        version_parts = str(self.version).split(".")
+        if len(version_parts) == 3 and version_parts[2] == "0":
+            return f"v{version_parts[0]}.{version_parts[1]}"
+        return f"v{self.version}"
 
     @property
     def _kernel_arch(self):
