@@ -37,12 +37,18 @@ set(WEBOTS_CONTROLLER_CPP_SOURCES
     TouchSensor.cpp
     VacuumGripper.cpp)
 
-list(TRANSFORM WEBOTS_CONTROLLER_CPP_SOURCES PREPEND "${WEBOTS_CONTROLLER_CPP_SOURCE_DIR}/")
+set(WEBOTS_CONTROLLER_CPP_SOURCE_PATHS)
+foreach(_src IN LISTS WEBOTS_CONTROLLER_CPP_SOURCES)
+  set(_candidate "${WEBOTS_CONTROLLER_CPP_SOURCE_DIR}/${_src}")
+  if(EXISTS "${_candidate}")
+    list(APPEND WEBOTS_CONTROLLER_CPP_SOURCE_PATHS "${_candidate}")
+  endif()
+endforeach()
 
 file(GLOB_RECURSE WEBOTS_CONTROLLER_CPP_PUBLIC_HEADERS CONFIGURE_DEPENDS
      "${WEBOTS_REPO_SOURCE_DIR}/include/controller/cpp/webots/*.hpp")
 
-add_library(webots_cpp_controller ${WEBOTS_CONTROLLER_CPP_SOURCES})
+add_library(webots_cpp_controller ${WEBOTS_CONTROLLER_CPP_SOURCE_PATHS})
 add_library(webots-controller::webots_cpp_controller ALIAS
             webots_cpp_controller)
 add_library(webots-controller::CppController ALIAS webots_cpp_controller)
