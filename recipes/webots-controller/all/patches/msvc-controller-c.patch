@@ -1,0 +1,28 @@
+diff --git a/motion.c b/motion.c
+index 02c5e62..3de3b2f 100644
+--- a/motion.c
++++ b/motion.c
+@@ -45,7 +45,7 @@ typedef struct WbMotionStructPrivate {
+ extern void wb_motor_set_position_no_mutex(WbDeviceTag, double);
+ 
+ static const int UNDEFINED_TIME = -1;
+-static const int MAX_LINE = 4096;
++#define MAX_LINE 4096
+ static const double UNDEFINED_POSITION = -9999999.9;
+ static WbMotionRef head = NULL;
+ static const char *HEADER = "#WEBOTS_MOTION";
+diff --git a/robot.c b/robot.c
+index 6bb2b81..4d4cb6b 100644
+--- a/robot.c
++++ b/robot.c
+@@ -65,6 +65,10 @@
+ #include "supervisor_private.h"
+ #include "tcp_client.h"
+ 
++#ifdef _WIN32
++#undef wb_robot_init
++#endif
++
+ #ifdef _WIN32
+ #include <windows.h>  // GetCommandLine
+ #else

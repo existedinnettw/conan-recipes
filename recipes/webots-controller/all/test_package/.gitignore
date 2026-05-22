@@ -1,0 +1,11 @@
+# Ignore everything
+*
+# But do not ignore files with extensions (like .c, .py, .md)
+!*.*
+# Do not ignore directories
+!*/
+*.dll
+*.exe
+build/
+*.pyc
+*.json

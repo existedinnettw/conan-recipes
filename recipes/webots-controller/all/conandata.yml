@@ -1,10 +1,10 @@
 sources:
-  "2023a":
+  "r2023a":
     git_url: "https://github.com/cyberbotics/webots.git"
     ref: "R2023a"
-  "2023b":
+  "r2023b":
     git_url: "https://github.com/cyberbotics/webots.git"
     ref: "R2023b"
-  "2025a":
+  "r2025a":
     git_url: "https://github.com/cyberbotics/webots.git"
     ref: "R2025a"
