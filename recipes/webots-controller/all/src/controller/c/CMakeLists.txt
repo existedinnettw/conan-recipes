@@ -65,8 +65,13 @@ set(WEBOTS_CONTROLLER_C_PLUGIN_SOURCES dynamic_library.c html_robot_window.c
 
 set(WEBOTS_CONTROLLER_C_SOURCES ${WEBOTS_CONTROLLER_C_CORE_SOURCES})
 list(APPEND WEBOTS_CONTROLLER_C_SOURCES ${WEBOTS_CONTROLLER_C_PLUGIN_SOURCES})
-
-list(TRANSFORM WEBOTS_CONTROLLER_C_SOURCES PREPEND "${WEBOTS_CONTROLLER_C_SOURCE_DIR}/")
+set(WEBOTS_CONTROLLER_C_SOURCE_PATHS)
+foreach(_src IN LISTS WEBOTS_CONTROLLER_C_SOURCES)
+  set(_candidate "${WEBOTS_CONTROLLER_C_SOURCE_DIR}/${_src}")
+  if(EXISTS "${_candidate}")
+    list(APPEND WEBOTS_CONTROLLER_C_SOURCE_PATHS "${_candidate}")
+  endif()
+endforeach()
 
 if(MSVC)
   find_package(Git REQUIRED)
@@ -88,11 +93,17 @@ if(MSVC)
     message(FATAL_ERROR "Failed to apply MSVC controller C source patch")
   endif()
 
-  list(TRANSFORM WEBOTS_CONTROLLER_C_SOURCES
-       REPLACE "^${WEBOTS_CONTROLLER_C_SOURCE_DIR}" "${WEBOTS_CONTROLLER_MSVC_SOURCE_DIR}")
+  set(_msvc_source_paths)
+  foreach(_src IN LISTS WEBOTS_CONTROLLER_C_SOURCES)
+    set(_candidate "${WEBOTS_CONTROLLER_MSVC_SOURCE_DIR}/${_src}")
+    if(EXISTS "${_candidate}")
+      list(APPEND _msvc_source_paths "${_candidate}")
+    endif()
+  endforeach()
+  set(WEBOTS_CONTROLLER_C_SOURCE_PATHS ${_msvc_source_paths})
 endif()
 
-add_library(webots_controller ${WEBOTS_CONTROLLER_C_SOURCES})
+add_library(webots_controller ${WEBOTS_CONTROLLER_C_SOURCE_PATHS})
 add_library(webots-controller::webots_controller ALIAS webots_controller)
 add_library(webots-controller::Controller ALIAS webots_controller)
 
