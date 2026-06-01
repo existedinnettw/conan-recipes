@@ -11,6 +11,11 @@ from conan.tools.files import copy, get, save
 
 class LinuxKbuildTreeConan(ConanFile):
     name = "linux-kbuild-tree"
+    license = "GPL-2.0-only"
+    url = "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
+    homepage = "https://www.kernel.org"
+    description = "Prepared Linux kernel source tree for building external kernel modules"
+    topics = ("linux", "kernel", "kbuild", "kernel-module", "modules")
     package_type = "unknown"
     upload_policy = "skip"
     build_policy = "missing"
@@ -20,13 +25,11 @@ class LinuxKbuildTreeConan(ConanFile):
     options = {
         "url": ["ANY"],
         "defconfig": ["ANY"],
-        "make_modules": [True, False],
     }
 
     default_options = {
         "url": "",
         "defconfig": "defconfig",
-        "make_modules": False,
     }
 
     exports_sources = "configs/*"
@@ -86,11 +89,6 @@ class LinuxKbuildTreeConan(ConanFile):
 
         self.run(f"{make_base} olddefconfig prepare modules_prepare")
 
-        if self.options.make_modules:
-            # Required when CONFIG_MODVERSIONS=y and the target kernel exports
-            # symbols that are not available from a vendor-provided Module.symvers.
-            self.run(f"{make_base} modules")
-
         kernelrelease = self._capture(f"{make_base} kernelrelease")
         compiler = self._capture(f"{self._cross_gcc} --version").splitlines()[0]
         source_url, sha256 = self._linux_source()
@@ -107,7 +105,6 @@ class LinuxKbuildTreeConan(ConanFile):
                     f"arch={arch}",
                     f"cross_compile={cross_compile}",
                     f"compiler={compiler}",
-                    f"make_modules={self.options.make_modules}",
                     "",
                 ]
             ),
@@ -120,6 +117,20 @@ class LinuxKbuildTreeConan(ConanFile):
         # .config, and often Module.symvers. Packaging the whole prepared tree is
         # intentionally conservative and can be optimized after the flow is stable.
         copy(self, "*", src=linux, dst=self.package_folder, excludes=(".git", ".git/*"))
+        copy(
+            self,
+            "COPYING",
+            src=linux,
+            dst=os.path.join(self.package_folder, "licenses"),
+            keep_path=False,
+        )
+        copy(
+            self,
+            "LICENSES/*",
+            src=linux,
+            dst=os.path.join(self.package_folder, "licenses"),
+            keep_path=True,
+        )
         copy(self, ".config", src=linux, dst=self.package_folder, keep_path=False)
         copy(
             self,
