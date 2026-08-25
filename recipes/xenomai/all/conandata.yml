@@ -1,0 +1,4 @@
+sources:
+  "3.3.3":
+    url: "https://gitlab.com/Xenomai/xenomai3/xenomai/-/archive/v3.3.3/xenomai-v3.3.3.tar.gz"
+    sha256: "9d4902abf6c01e6d6a2cc9238e0df038aa40d548f139253bb320b2e67da8d1b6"
