@@ -12,6 +12,7 @@ from pathlib import Path
 REPO_ROOT = Path(os.environ.get("GITHUB_WORKSPACE", Path(__file__).resolve().parents[2])).resolve()
 RECIPES_DIR = REPO_ROOT / "recipes"
 VERSION_LINE_RE = re.compile(r'^  "([^"]+)":\s*$')
+FULL_SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def run_git(*args, check=True):
@@ -28,6 +29,31 @@ def run_git(*args, check=True):
         raise RuntimeError(
             f"git {' '.join(args)} failed in {REPO_ROOT}: {exc.stderr.strip() or exc.stdout.strip() or exc}"
         ) from exc
+
+
+def git_commit_exists(ref):
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f"{ref}^{{commit}}"],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def ensure_git_commit(ref):
+    """Fetch an event commit that is no longer reachable after a force-push."""
+    if git_commit_exists(ref):
+        return
+
+    # Only fetch an exact object ID. Event SHAs are trusted, while accepting an
+    # arbitrary ref here would make local and CI behavior harder to reason about.
+    if not FULL_SHA_RE.fullmatch(ref):
+        raise RuntimeError(f"Git commit is unavailable locally: {ref}")
+
+    run_git("fetch", "--no-tags", "--depth=1", "origin", ref)
+    if not git_commit_exists(ref):
+        raise RuntimeError(f"Git commit is unavailable after fetching it from origin: {ref}")
 
 
 def git_file(ref, path):
@@ -95,6 +121,9 @@ def list_changed_files(base, head):
 
 
 def build_targets(base, head, mode):
+    if not os.environ.get("ACT_CHANGED_FILES", "").strip():
+        ensure_git_commit(base)
+        ensure_git_commit(head)
     changed_files = list_changed_files(base, head)
     targets = {}
 

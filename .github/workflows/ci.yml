@@ -22,6 +22,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Test recipe target detector
+        run: python3 .github/scripts/test_detect_recipe_matrix.py
+
       - name: Detect changed recipe targets
         id: detect
         shell: bash
