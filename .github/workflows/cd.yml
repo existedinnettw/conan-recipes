@@ -100,19 +100,9 @@ jobs:
         run: |
           conan create "${{ matrix.path }}" --version="${{ matrix.version }}" --build=missing
 
-      - name: Upload package if missing on remote
-        shell: bash
+      - name: Upload package revisions
         run: |
-          set -euo pipefail
-          ref="${{ matrix.reference }}"
-          remote_json="$(conan list "${ref}:*" -r org --format=json || true)"
-          if python3 -c 'import json, sys; data = json.loads((sys.argv[1].strip() or "{}")); has_package = any(isinstance(recipe_data, dict) and recipe_data.get("packages") for remote_data in data.values() if isinstance(remote_data, dict) for recipe_data in remote_data.values()); sys.exit(0 if has_package else 1)' "$remote_json"
-          then
-            echo "Remote already has packages for ${ref}; skipping upload."
-            exit 0
-          fi
-
-          conan upload "${ref}" -r org --confirm
+          conan upload "${{ matrix.reference }}" -r org --confirm
 
   no-targets:
     needs: detect-targets
