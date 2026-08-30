@@ -54,6 +54,10 @@ jobs:
     needs: detect-targets
     if: needs.detect-targets.outputs.has_targets == 'true'
     runs-on: ubuntu-latest
+    env:
+      CONAN_REMOTE_URL: ${{ secrets.CONAN_REMOTE_URL }}
+      CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME || secrets.GITEA_USERNAME }}
+      CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD || secrets.GITEA_TOKEN }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-targets.outputs.matrix) }}
@@ -78,6 +82,14 @@ jobs:
         with:
           version: "2.*"
           use_venv: true
+
+      - name: Authenticate Conan remote
+        run: |
+          test -n "$CONAN_REMOTE_URL" || (echo "Missing secret: CONAN_REMOTE_URL" && exit 1)
+          test -n "$CONAN_LOGIN_USERNAME" || (echo "Missing secret: CONAN_LOGIN_USERNAME" && exit 1)
+          test -n "$CONAN_PASSWORD" || (echo "Missing secret: CONAN_PASSWORD" && exit 1)
+          conan remote add org "$CONAN_REMOTE_URL" --force
+          conan remote login org "$CONAN_LOGIN_USERNAME" --password "$CONAN_PASSWORD"
 
       - name: Detect Conan profile
         run: |

@@ -38,6 +38,18 @@ class CANopenNodeConan(ConanFile):
             dst=os.path.join(self.package_folder, "src"),
             excludes=("example/*",),
         )
+        copy(
+            self,
+            "CO_driver_blank.c",
+            src=os.path.join(self.source_folder, "example"),
+            dst=os.path.join(self.package_folder, "src", "example"),
+        )
+        copy(
+            self,
+            "DS301_profile.eds",
+            src=os.path.join(self.source_folder, "example"),
+            dst=os.path.join(self.package_folder, "res"),
+        )
         save(
             self,
             os.path.join(self.package_folder, "cmake", "CANopenNodeSources.cmake"),
@@ -103,6 +115,17 @@ if(NOT TARGET CANopenNode::CANopenNode)
         TARGET CANopenNode::CANopenNode
         PROPERTY INTERFACE_SOURCES
 {source_properties}
+    )
+
+    add_library(CANopenNode::example_driver INTERFACE IMPORTED)
+    set_property(
+        TARGET CANopenNode::example_driver
+        PROPERTY INTERFACE_LINK_LIBRARIES CANopenNode::headers
+    )
+    set_property(
+        TARGET CANopenNode::example_driver
+        PROPERTY INTERFACE_SOURCES
+            "${{_CANOPENNODE_PACKAGE_ROOT}}/src/example/CO_driver_blank.c"
     )
 
     unset(_CANOPENNODE_PACKAGE_ROOT)
