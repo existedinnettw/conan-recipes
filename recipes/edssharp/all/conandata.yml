@@ -1,0 +1,5 @@
+sources:
+  "4.2.3":
+    url: "https://github.com/CANopenNode/CANopenEditor/archive/refs/tags/v4.2.3.tar.gz"
+    sha256: "37e5d635ddf11728fc993edbdc8c96583bae6c7e6f2589fa884f70681223e279"
+
