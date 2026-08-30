@@ -1,0 +1,5 @@
+sources:
+  "4.0.0":
+    url: "https://github.com/CANopenNode/CANopenLinux/archive/025ec339cf8ec784fc7b2971b5528403a819c545.tar.gz"
+    sha256: "29f9d71f0061aae2d93b494e99a493fe773f7aa892161107c91e3083b998acbb"
+
