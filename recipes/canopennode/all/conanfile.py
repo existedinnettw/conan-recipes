@@ -48,6 +48,7 @@ class CANopenNodeConan(ConanFile):
         self.info.clear()
 
     def package_info(self):
+        self.cpp_info.includedirs = ["include", os.path.join("include", "301")]
         self.cpp_info.set_property("cmake_file_name", "CANopenNode")
         self.cpp_info.set_property("cmake_target_name", "CANopenNode::headers")
         self.cpp_info.set_property(
