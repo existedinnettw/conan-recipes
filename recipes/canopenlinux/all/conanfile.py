@@ -108,4 +108,3 @@ if(NOT TARGET CANopenLinux::CANopenLinux)
     unset(_CANOPENLINUX_PACKAGE_ROOT)
 endif()
 """
-

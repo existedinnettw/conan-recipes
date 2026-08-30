@@ -1,5 +1,9 @@
+import os
+
 from conan import ConanFile
+from conan.tools.build import can_run
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.env import VirtualBuildEnv
 
 
 class TestPackageConan(ConanFile):
@@ -11,12 +15,24 @@ class TestPackageConan(ConanFile):
     def requirements(self):
         self.requires(self.tested_reference_str)
 
+    def build_requirements(self):
+        self.tool_requires("edssharp/4.2.3")
+
     def layout(self):
         cmake_layout(self)
 
     def generate(self):
         CMakeDeps(self).generate()
-        CMakeToolchain(self).generate()
+        tool = self.dependencies.build["edssharp"]
+        toolchain = CMakeToolchain(self)
+        toolchain.variables["EDSSharp_EXECUTABLE"] = os.path.join(
+            tool.package_folder, "bin", "EDSSharp"
+        )
+        toolchain.variables["TEST_OD_INPUT"] = os.path.join(
+            tool.package_folder, "res", "minimal_project.xdd"
+        )
+        toolchain.generate()
+        VirtualBuildEnv(self).generate()
 
     def build(self):
         cmake = CMake(self)
@@ -24,5 +40,5 @@ class TestPackageConan(ConanFile):
         cmake.build()
 
     def test(self):
-        pass
-
+        if can_run(self):
+            self.run(self.cpp.build.bindir + "/test_package", env="conanrun")
