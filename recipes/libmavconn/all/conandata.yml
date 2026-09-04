@@ -1,0 +1,8 @@
+sources:
+  "2.15.1":
+    mavros:
+      url: "https://github.com/mavlink/mavros/archive/refs/tags/2.15.1.tar.gz"
+      sha256: "af9c8faa91f51b3c335263094689a329fa79ab252d1ef6962c149f113aa810ab"
+    mavlink:
+      url: "https://github.com/ros2-gbp/mavlink-gbp-release/archive/65568c4be9af54d810cea9dda193ed35ca42ce23.tar.gz"
+      sha256: "6962672ec3f65596ab2728aab9df0d93cececa9c34af34d93056703c440484c7"
