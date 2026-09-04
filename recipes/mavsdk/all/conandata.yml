@@ -1,0 +1,5 @@
+sources:
+  "3.17.4":
+    url: "https://github.com/mavlink/MAVSDK/archive/refs/tags/v3.17.4.tar.gz"
+    sha256: "9e96fcb8a22027ca3d318cefc297e9f8eff22ed2e0deb9f0dc10ce595ea230aa"
+
