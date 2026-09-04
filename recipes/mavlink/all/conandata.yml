@@ -1,0 +1,8 @@
+sources:
+  "1.0.12":
+    mavlink:
+      url: "https://github.com/mavlink/mavlink/archive/refs/tags/1.0.12.tar.gz"
+      sha256: "940ac31416d826f959d7f62fd4696ce6f23cf3e8c71c80a678a33ad93b4bf66d"
+    pymavlink:
+      url: "https://github.com/ArduPilot/pymavlink/archive/a1c710675edea61a377a58b9d0c4cebd6eaa7904.tar.gz"
+      sha256: "289a6b188971d35e1447c2c5406f4b5cc9c2ea7ebfca91f88d6dd9c6a7118f37"
