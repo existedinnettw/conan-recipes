@@ -29,8 +29,8 @@ class LibmavconnConan(ConanFile):
             self.options.rm_safe("fPIC")
 
     def requirements(self):
-        self.requires("asio/1.38.2")
-        self.requires("console_bridge/1.0.2")
+        self.requires("asio/1.38.2", transitive_headers=True)
+        self.requires("console_bridge/1.0.2", transitive_headers=True)
 
     def validate(self):
         if self.settings.compiler.get_safe("cppstd"):
