@@ -64,7 +64,7 @@ jobs:
       - name: Install host build tools
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: build-essential gcc-14 g++-14 cmake ninja-build graphviz crudini libelf-dev flex bison bc libssl-dev autoconf automake libtool libltdl-dev
+          packages: build-essential gcc-14 g++-14 cmake ninja-build python3-venv graphviz crudini libelf-dev flex bison bc libssl-dev autoconf automake libtool libltdl-dev
           version: 1.0
           execute_install_scripts: true
 

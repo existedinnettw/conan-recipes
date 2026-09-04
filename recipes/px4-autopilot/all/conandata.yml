@@ -1,0 +1,4 @@
+sources:
+  "1.17.0":
+    git_url: "https://github.com/PX4/PX4-Autopilot.git"
+    ref: "v1.17.0"
