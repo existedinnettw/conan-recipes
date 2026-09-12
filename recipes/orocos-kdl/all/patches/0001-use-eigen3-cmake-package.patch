@@ -1,0 +1,16 @@
+--- a/orocos_kdl/CMakeLists.txt
++++ b/orocos_kdl/CMakeLists.txt
+@@ -51,12 +51,7 @@
+ 
+ SET( KDL_CFLAGS "")
+ 
+-find_package(Eigen3 QUIET)
+-if(NOT EIGEN3_FOUND)
+-  include(${PROJ_SOURCE_DIR}/cmake/FindEigen3.cmake)
+-endif()
+-include_directories(${EIGEN3_INCLUDE_DIR})
+-SET(KDL_CFLAGS "${KDL_CFLAGS} -I\"${EIGEN3_INCLUDE_DIR}\"")
++find_package(Eigen3 REQUIRED CONFIG)
+ 
+ # Check the platform STL containers capabilities
+ include(cmake/CheckSTLContainers.cmake)
