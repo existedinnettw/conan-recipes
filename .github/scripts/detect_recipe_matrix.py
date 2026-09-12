@@ -12,6 +12,7 @@ from pathlib import Path
 REPO_ROOT = Path(os.environ.get("GITHUB_WORKSPACE", Path(__file__).resolve().parents[2])).resolve()
 RECIPES_DIR = REPO_ROOT / "recipes"
 VERSION_LINE_RE = re.compile(r'^  "([^"]+)":\s*$')
+TOP_LEVEL_KEY_RE = re.compile(r"^(?P<key>[^\s#][^:]*):(?:\s|$)")
 FULL_SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
@@ -70,23 +71,46 @@ def git_file(ref, path):
 
 
 def parse_conandata_versions(text):
+    """Map each version under the top-level `sources:` key to its literal block.
+
+    Only `sources:` is scanned. Other top-level keys such as `patches:` repeat the
+    same version keys, and letting their blocks overwrite the source ones would
+    hide a url/sha256 bump from compute_changed_versions().
+    """
     if not text:
         return {}
 
     versions = {}
+    in_sources = False
     current = None
     block = []
+
+    def flush():
+        nonlocal current, block
+        if current is not None:
+            versions[current] = "\n".join(block).rstrip()
+        current = None
+        block = []
+
     for line in text.splitlines():
+        top_level = TOP_LEVEL_KEY_RE.match(line)
+        if top_level:
+            flush()
+            in_sources = top_level.group("key").strip() == "sources"
+            continue
+
+        if not in_sources:
+            continue
+
         match = VERSION_LINE_RE.match(line)
         if match:
-            if current is not None:
-                versions[current] = "\n".join(block).rstrip()
+            flush()
             current = match.group(1)
             block = [line]
         elif current is not None:
             block.append(line)
-    if current is not None:
-        versions[current] = "\n".join(block).rstrip()
+
+    flush()
     return versions
 
 
