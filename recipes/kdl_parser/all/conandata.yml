@@ -1,0 +1,10 @@
+sources:
+  "1.14.2":
+    url: "https://github.com/ros/kdl_parser/archive/refs/tags/1.14.2.tar.gz"
+    sha256: "da528dfdf8dd0939f6f7ddba3c9f86ab7de6e27c4119d3fe6df65134ca35fb5a"
+
+patches:
+  "1.14.2":
+    - patch_file: "patches/0001-support-windows-static-builds.patch"
+      patch_description: "Stop importing symbols from a DLL when the library is built statically"
+      patch_type: "portability"

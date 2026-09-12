@@ -14,3 +14,4 @@ The goal of this repo is provide some **non-official** recipes for libraries tha
 * [audacity/conan-recipes](https://github.com/audacity/conan-recipes)
 * [bkinnightskytw/ethercat](https://gitlab.com/bkinnightskytw/ethercat/-/tree/backport/1.5.3-conan?ref_type=heads) (recipe: `igh-ethercat`)
 * [existedinnettw/orocos_kinematics_dynamics](https://github.com/existedinnettw/orocos_kinematics_dynamics) (recipe: `orocos-kdl`)
+* [existedinnettw/kdl_parser](https://github.com/existedinnettw/kdl_parser) (recipe: `kdl_parser`)
