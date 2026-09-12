@@ -1,0 +1,50 @@
+--- a/kdl_parser/src/kdl_parser.cpp
++++ b/kdl_parser/src/kdl_parser.cpp
+@@ -30,13 +30,28 @@
+ 
+ #include "kdl_parser/kdl_parser.hpp"
+ 
++#include <cstdio>
++#include <fstream>
++#include <sstream>
+ #include <string>
+ #include <vector>
+ 
+ #include "kdl/frames_io.hpp"
+-#include "urdf/model.hpp"
+-#include "urdf/urdfdom_compatibility.h"
+-#include "rcutils/logging_macros.h"
++#include "urdf_parser/urdf_parser.h"
++
++// urdf::Model and rcutils both live in packages that only exist inside a ROS 2
++// workspace. urdfdom parses the same documents on its own, and the diagnostics
++// go to stderr instead of the ROS logger.
++#define KDL_PARSER_LOG(severity, name, ...) \
++  do { \
++    std::fprintf(stderr, "[" severity "] [" name "]: "); \
++    std::fprintf(stderr, __VA_ARGS__); \
++    std::fprintf(stderr, "\n"); \
++  } while (0)
++
++#define RCUTILS_LOG_DEBUG_NAMED(name, ...) do {} while (0)
++#define RCUTILS_LOG_WARN_NAMED(name, ...) KDL_PARSER_LOG("WARN", name, __VA_ARGS__)
++#define RCUTILS_LOG_ERROR_NAMED(name, ...) KDL_PARSER_LOG("ERROR", name, __VA_ARGS__)
+ 
+ 
+ namespace kdl_parser
+@@ -167,12 +182,12 @@
+ 
+ bool treeFromString(const std::string & xml, KDL::Tree & tree)
+ {
+-  urdf::Model robot_model;
+-  if (!robot_model.initString(xml.c_str())) {
++  urdf::ModelInterfaceSharedPtr robot_model = urdf::parseURDF(xml);
++  if (!robot_model) {
+     RCUTILS_LOG_ERROR_NAMED("kdl_parser", "Could not generate robot model.");
+     return false;
+   }
+-  return treeFromUrdfModel(robot_model, tree);
++  return treeFromUrdfModel(*robot_model, tree);
+ }
+ 
+ bool treeFromUrdfModel(const urdf::ModelInterface & robot_model, KDL::Tree & tree)
