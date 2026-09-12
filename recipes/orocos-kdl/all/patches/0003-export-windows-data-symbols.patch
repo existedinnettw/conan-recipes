@@ -1,0 +1,55 @@
+--- a/orocos_kdl/src/utilities/utility.h
++++ b/orocos_kdl/src/utilities/utility.h
+@@ -171,31 +171,43 @@
+  * If you want to explicitly declare internal linkage, use "static".
+  */
+ //! 
+-extern int          STREAMBUFFERSIZE;
++// Windows shared library (dll) export/import handling for data symbols.
++// CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not reliably export data, so an
++// explicit macro is used: OROCOS_KDL_BUILD_SHARED is defined while building
++// the library, OROCOS_KDL_USE_SHARED while consuming it.
++#if defined(_WIN32) && defined(OROCOS_KDL_BUILD_SHARED)
++#  define OROCOS_KDL_API __declspec(dllexport)
++#elif defined(_WIN32) && defined(OROCOS_KDL_USE_SHARED)
++#  define OROCOS_KDL_API __declspec(dllimport)
++#else
++#  define OROCOS_KDL_API
++#endif
++
++extern OROCOS_KDL_API int          STREAMBUFFERSIZE;
+ 
+ //! maximal length of a file name
+-extern int          MAXLENFILENAME;
++extern OROCOS_KDL_API int          MAXLENFILENAME;
+ 
+ //! the value of pi
+-extern const double PI;
++extern OROCOS_KDL_API const double PI;
+ 
+ //! the value of pi/2
+-extern const double PI_2;
++extern OROCOS_KDL_API const double PI_2;
+ 
+ //! the value of pi/4
+-extern const double PI_4;
++extern OROCOS_KDL_API const double PI_4;
+ 
+ //! the value pi/180
+-extern const double deg2rad;
++extern OROCOS_KDL_API const double deg2rad;
+ 
+ //! the value 180/pi
+-extern const double rad2deg;
++extern OROCOS_KDL_API const double rad2deg;
+ 
+ //! default precision while comparing with Equal(..,..) functions. Initialized at 0.0000001.
+-extern double     epsilon;
++extern OROCOS_KDL_API double     epsilon;
+ 
+ //! the number of derivatives used in the RN-... objects.
+-extern int          VSIZE;
++extern OROCOS_KDL_API int          VSIZE;
+ 
+ 
+ 

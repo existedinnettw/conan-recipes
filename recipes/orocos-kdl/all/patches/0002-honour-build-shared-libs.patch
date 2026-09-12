@@ -1,0 +1,44 @@
+--- a/orocos_kdl/src/CMakeLists.txt
++++ b/orocos_kdl/src/CMakeLists.txt
+@@ -4,14 +4,13 @@
+ FILE( GLOB UTIL_HPPS utilities/[^.]*.h utilities/[^.]*.hpp)
+ 
+ #In Windows (Visual Studio) it is necessary to specify the postfix
+-#of the debug library name and no symbols are exported by kdl, 
+-#so it is necessary to compile it as a static library
++#of the debug library name. The library type is left empty so that
++#BUILD_SHARED_LIBS decides whether a shared or a static library is built.
+ IF(MSVC)
+     SET(CMAKE_DEBUG_POSTFIX "d")
+-    SET(LIB_TYPE STATIC)
+-ELSE(MSVC)
+-    SET(LIB_TYPE SHARED)
++    SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ ENDIF(MSVC)
++SET(LIB_TYPE "")
+ 
+ CONFIGURE_FILE(config.h.in config.h @ONLY)
+ 
+@@ -52,6 +51,13 @@
+ 
+ ADD_LIBRARY(orocos-kdl ${LIB_TYPE} ${KDL_SRCS})
+ 
++# CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not export data symbols, so the
++# exported/imported data in utilities/utility.h is marked explicitly instead.
++IF(WIN32 AND BUILD_SHARED_LIBS)
++  TARGET_COMPILE_DEFINITIONS(orocos-kdl PRIVATE OROCOS_KDL_BUILD_SHARED)
++  TARGET_COMPILE_DEFINITIONS(orocos-kdl PUBLIC OROCOS_KDL_USE_SHARED)
++ENDIF()
++
+ TARGET_INCLUDE_DIRECTORIES(orocos-kdl PUBLIC
+   "$<INSTALL_INTERFACE:include>")
+ 
+@@ -72,7 +78,7 @@
+ # Needed so that the generated config.h can be used
+ TARGET_INCLUDE_DIRECTORIES(orocos-kdl PUBLIC
+   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")
+-TARGET_LINK_LIBRARIES(orocos-kdl ${Boost_LIBRARIES})
++TARGET_LINK_LIBRARIES(orocos-kdl ${Boost_LIBRARIES} Eigen3::Eigen)
+ 
+ INSTALL(TARGETS orocos-kdl
+   EXPORT OrocosKDLTargets

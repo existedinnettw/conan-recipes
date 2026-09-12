@@ -1,0 +1,16 @@
+sources:
+  "1.5.4":
+    url: "https://github.com/orocos/orocos_kinematics_dynamics/archive/refs/tags/1.5.4.tar.gz"
+    sha256: "b47c75b03d5980a8b3a5382ab1176ae552f2f5418ad42b0e530a4178e3e1c301"
+
+patches:
+  "1.5.4":
+    - patch_file: "patches/0001-use-eigen3-cmake-package.patch"
+      patch_description: "Resolve Eigen3 through its CMake package instead of the bundled FindEigen3.cmake"
+      patch_type: "conan"
+    - patch_file: "patches/0002-honour-build-shared-libs.patch"
+      patch_description: "Let BUILD_SHARED_LIBS pick the library type and link Eigen3::Eigen"
+      patch_type: "conan"
+    - patch_file: "patches/0003-export-windows-data-symbols.patch"
+      patch_description: "Export/import the global data symbols from the Windows shared library"
+      patch_type: "portability"
