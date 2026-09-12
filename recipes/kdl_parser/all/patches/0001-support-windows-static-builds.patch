@@ -1,0 +1,14 @@
+--- a/kdl_parser/include/kdl_parser/visibility_control.hpp
++++ b/kdl_parser/include/kdl_parser/visibility_control.hpp
+@@ -55,7 +55,10 @@
+     #define KDL_PARSER_IMPORT __declspec(dllimport)
+     #define KDL_PARSER_DEPRECATED(msg) __declspec(deprecated(msg))
+   #endif
+-  #ifdef KDL_PARSER_BUILDING_DLL
++  #if defined KDL_PARSER_STATIC
++    // A static library neither exports nor imports its symbols.
++    #define KDL_PARSER_PUBLIC
++  #elif defined KDL_PARSER_BUILDING_DLL
+     #define KDL_PARSER_PUBLIC KDL_PARSER_EXPORT
+   #else
+     #define KDL_PARSER_PUBLIC KDL_PARSER_IMPORT
