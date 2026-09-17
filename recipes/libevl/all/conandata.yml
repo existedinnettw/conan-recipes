@@ -1,0 +1,26 @@
+sources:
+  "0.61":
+    libevl:
+      url: "https://gitlab.com/Xenomai/xenomai4/libevl/-/archive/r61/libevl-r61.tar.gz"
+      sha256: "507b1d8f7e28628858f2e1ad982d38539d262c1b84c1f72756d8251790b630c3"
+    # libevl 0.61 requires EVL ABI 47 (include/evl/version.h: EVL_ABI_PREREQ).
+    # These archives carry the uapi headers of a kernel exposing that ABI and
+    # nothing else; the running kernel still has to provide an EVL core whose
+    # ABI range covers 47. Build with `-o libevl/*:uapi=<evl kernel tree>` to
+    # use the headers of another EVL kernel instead.
+    uapi:
+      ref: "v7.1-evl3-rebase"
+      abi_level: 47
+      include:
+        url: "https://gitlab.com/Xenomai/xenomai4/linux-evl/-/archive/v7.1-evl3-rebase/linux-evl-v7.1-evl3-rebase.tar.gz?path=include/uapi"
+        sha256: "99bf732f1367377a786d98d39106c4f09589517ab7d12fcf62b5adb20bfa8c59"
+      arch:
+        x86:
+          url: "https://gitlab.com/Xenomai/xenomai4/linux-evl/-/archive/v7.1-evl3-rebase/linux-evl-v7.1-evl3-rebase.tar.gz?path=arch/x86/include/uapi/asm/evl"
+          sha256: "d53bb1340aa77c811a5bf48642ea3c8f436e3eedd421bb1810cb8db5b5b2ca6f"
+        arm64:
+          url: "https://gitlab.com/Xenomai/xenomai4/linux-evl/-/archive/v7.1-evl3-rebase/linux-evl-v7.1-evl3-rebase.tar.gz?path=arch/arm64/include/uapi/asm/evl"
+          sha256: "91663ec52250fb91bd259af14fcbd24c0ec5b325974a9983e362d506255f6275"
+        arm:
+          url: "https://gitlab.com/Xenomai/xenomai4/linux-evl/-/archive/v7.1-evl3-rebase/linux-evl-v7.1-evl3-rebase.tar.gz?path=arch/arm/include/uapi/asm/evl"
+          sha256: "49c2e12f343804bf6cdc14e31ad58ab6bd07bbc226587d6e86ac594625aa9bfb"
