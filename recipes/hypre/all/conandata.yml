@@ -1,0 +1,4 @@
+sources:
+  "3.2.0":
+    url: "https://github.com/hypre-space/hypre/archive/refs/tags/v3.2.0.tar.gz"
+    sha256: "5273205a310fb6aa3ae506ce216760fb67b30e02024874f3cdb8b811e4801de7"
