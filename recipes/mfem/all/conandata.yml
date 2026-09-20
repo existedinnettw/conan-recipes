@@ -1,0 +1,16 @@
+sources:
+  "4.10":
+    url: "https://github.com/mfem/mfem/archive/refs/tags/v4.10.tar.gz"
+    sha256: "d5aabe991b8b5569aa26e2b5d4b59ac617ee10ebac3d45fd6ff9c74b2c1a47dd"
+  "4.9":
+    url: "https://github.com/mfem/mfem/archive/refs/tags/v4.9.tar.gz"
+    sha256: "ea3ac13e182c09f05b414b03a9bef7a4da99d45d67ee409112b8f11058447a7c"
+patches:
+  "4.10":
+    - patch_file: "patches/4.10-0001-cmake-support-package-config-tpls.patch"
+      patch_description: "Let MPI, HYPRE and METIS be provided as CMake package configs"
+      patch_type: "conan"
+  "4.9":
+    - patch_file: "patches/4.9-0001-cmake-support-package-config-tpls.patch"
+      patch_description: "Let MPI, HYPRE and METIS be provided as CMake package configs"
+      patch_type: "conan"

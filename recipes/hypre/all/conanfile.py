@@ -43,11 +43,17 @@ class HypreConan(ConanFile):
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
+        if self.options.with_mpi:
+            # Open MPI's static archives define the MPI_* entry points as weak symbols,
+            # so a shared library linking libmpi.a does not pull them in and is left
+            # with undefined MPI symbols plus a partial copy of the profiling wrappers.
+            self.options["openmpi"].shared = True
 
     def requirements(self):
         if self.options.with_mpi:
-            # HYPRE.h includes <mpi.h> once the library is built with MPI.
-            self.requires("openmpi/[>=4.1 <5]", transitive_headers=True)
+            # HYPRE.h includes <mpi.h> once the library is built with MPI, and any
+            # consumer of a parallel hypre calls MPI itself.
+            self.requires("openmpi/[>=4.1 <5]", transitive_headers=True, transitive_libs=True)
         if self.options.with_lapack:
             self.requires("openblas/[>=0.3.24 <1]")
 
@@ -144,6 +150,15 @@ class HypreConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
 
     def package_info(self):
+        # Only the MPI C component: the openmpi package as a whole also carries
+        # libompitrace, whose PMPI wrappers print a trace line for every MPI call.
+        requires = []
+        if self.options.with_mpi:
+            requires.append("openmpi::ompi-c")
+        if self.options.with_lapack:
+            requires.append("openblas::openblas_component")
+        self.cpp_info.requires = requires
+
         self.cpp_info.set_property("cmake_file_name", "HYPRE")
         self.cpp_info.set_property("cmake_target_name", "HYPRE::HYPRE")
 

@@ -1,0 +1,53 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -318,6 +318,15 @@
+ if (MFEM_USE_MPI)
+   find_package(MPI REQUIRED)
+   set(MPI_CXX_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH})
++  # A package config for MPI (as opposed to CMake's FindMPI module) only defines
++  # imported targets, leaving the MPI_CXX_* variables collected further below empty.
++  # MFEM only uses the C API of MPI, so the C target is the one to fall back on.
++  if (NOT MPI_CXX_LIBRARIES AND TARGET MPI::MPI_C)
++    set(MPI_CXX_LIBRARIES MPI::MPI_C)
++  endif()
++  if (MPI_CXX_LIBRARIES)
++    set(MPI_CXX_FOUND TRUE)
++  endif()
+   if (MFEM_MPIEXEC)
+     string(REPLACE " " ";" MPIEXEC ${MFEM_MPIEXEC})
+   endif()
+@@ -326,6 +335,18 @@
+   endif()
+   # Parallel MFEM depends on hypre
+   find_package(HYPRE REQUIRED)
++  # FindHYPRE.cmake reports the version as an integer, which is what MFEM compares
++  # MFEM_HYPRE_VERSION against (see linalg/hypre.hpp). A package config reports the
++  # usual dotted string instead, so convert it.
++  if (HYPRE_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.?([0-9]*)")
++    set(HYPRE_MAJOR_VERSION "${CMAKE_MATCH_1}")
++    set(HYPRE_MINOR_VERSION "${CMAKE_MATCH_2}")
++    set(HYPRE_PATCH_VERSION "${CMAKE_MATCH_3}")
++    if (NOT HYPRE_PATCH_VERSION)
++      set(HYPRE_PATCH_VERSION 0)
++    endif()
++    math(EXPR HYPRE_VERSION "(${HYPRE_MAJOR_VERSION}*100+${HYPRE_MINOR_VERSION})*100+${HYPRE_PATCH_VERSION}")
++  endif()
+   set(MFEM_HYPRE_VERSION ${HYPRE_VERSION})
+   if (MFEM_USE_PETSC)
+     find_package(PETSc REQUIRED)
+@@ -351,6 +372,15 @@
+ 
+ if (MFEM_USE_METIS)
+   find_package(METIS REQUIRED)
++  # FindMETIS.cmake sets MFEM_USE_METIS_5 from a compile check. A package config
++  # does not, but it does report a version, which is enough to tell 4 from 5.
++  if (NOT DEFINED MFEM_USE_METIS_5 AND METIS_VERSION)
++    if (METIS_VERSION VERSION_GREATER_EQUAL 5)
++      set(MFEM_USE_METIS_5 ON)
++    else()
++      set(MFEM_USE_METIS_5 OFF)
++    endif()
++  endif()
+ endif()
+ 
+ if (MFEM_USE_GINKGO)
