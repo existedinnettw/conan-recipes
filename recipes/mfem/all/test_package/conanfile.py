@@ -25,6 +25,7 @@ class TestPackageConan(ConanFile):
         # at its upstream default instead of failing the build.
         options = self.dependencies["mfem"].options
         for macro, option in (
+            ("EXPECT_MPI", "with_mpi"),
             ("EXPECT_ZLIB", "with_zlib"),
             ("EXPECT_LAPACK", "with_lapack"),
             ("EXPECT_OPENMP", "with_openmp"),
