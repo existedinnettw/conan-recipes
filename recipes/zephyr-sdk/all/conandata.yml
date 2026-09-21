@@ -1,0 +1,753 @@
+sources:
+  "1.0.1":
+    base_url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v1.0.1"
+    minimal:
+      linux-x86_64:
+        file: "zephyr-sdk-1.0.1_linux-x86_64_minimal.tar.xz"
+        sha256: "ca9bc0ff66fafca1dac9d592a36d953cf16d096a9d09b1c0357f021cf9f6a7eb"
+      linux-aarch64:
+        file: "zephyr-sdk-1.0.1_linux-aarch64_minimal.tar.xz"
+        sha256: "d79c5bfc68e679488659bea289a4026e52a64f03338875c8c9c850fff13cee30"
+      macos-aarch64:
+        file: "zephyr-sdk-1.0.1_macos-aarch64_minimal.tar.xz"
+        sha256: "867063901f39528a6175a80ebc20367bd6cb440593e7e2650eda30392f1f6b65"
+    hosttools:
+      linux-x86_64:
+        file: "hosttools_linux-x86_64.tar.xz"
+        sha256: "4d90f2d9a42802bc76bfaacd2bb52e6c30a046a425148e1ed1a7311cb66bde60"
+      linux-aarch64:
+        file: "hosttools_linux-aarch64.tar.xz"
+        sha256: "c08e11efa5076b8e5a80e15f1923fdec4d87894259cee48ce85693dcb90dfb01"
+      macos-aarch64:
+        file: "hosttools_macos-aarch64.tar.xz"
+        sha256: "314f20abb48077ad2f419bc6777c0dde727c3f0f0163c0e1b3eecb6fbcf80954"
+    toolchains:
+      linux-x86_64:
+        aarch64-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_aarch64-zephyr-elf.tar.xz"
+          sha256: "01c0cfe1daaab2d2a0f71165f11a066d983ef97e51c4a3753186afa6ae55c24b"
+        arc-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_arc-zephyr-elf.tar.xz"
+          sha256: "3b2c499772a6a56d8e72fda4db35d3f3443a75f287968fcf6e80657f3b4f48ca"
+        arc64-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_arc64-zephyr-elf.tar.xz"
+          sha256: "e5247c0b9bc741782be373a6e60d2f7d81bced8ce0d68cc65c1e7e161e5cf05e"
+        arm-zephyr-eabi:
+          file: "toolchain_gnu_linux-x86_64_arm-zephyr-eabi.tar.xz"
+          sha256: "21b85981cb5a1818d9bc53d82af80f208946ec038b982ff1907287572ed3a634"
+        microblazeel-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_microblazeel-zephyr-elf.tar.xz"
+          sha256: "b7d09ab56ad141f43c0b9b835e1449ce4d0afeb645ec2d93a77bfaa30b30f48b"
+        mips-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_mips-zephyr-elf.tar.xz"
+          sha256: "6b0ee0f71bd1f2fd15d91950fced546b9542ba81dbcceff1456530ab95dac0bc"
+        or1k-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_or1k-zephyr-elf.tar.xz"
+          sha256: "b64ab85519bd53a08f87811040267883dba94ea59ca7b9b8f622ac43729cd2ea"
+        riscv64-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_riscv64-zephyr-elf.tar.xz"
+          sha256: "01750834c471fbdb335c1b8b8aee17010a1968938957db85640c366235771a38"
+        rx-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_rx-zephyr-elf.tar.xz"
+          sha256: "d3200cde7ab547094024900a6d289a62f0be05958d89131704d03e3e9499112d"
+        sparc-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_sparc-zephyr-elf.tar.xz"
+          sha256: "d11759fbe6accf4106601c79864270494ab6b1e6539fd29e8223e8e124fa609e"
+        x86_64-zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_x86_64-zephyr-elf.tar.xz"
+          sha256: "960fd8d8690ce130b141736e494a7bae7da1f96956f8da405de66429670b62e9"
+        xtensa-amd_acp_6_0_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-amd_acp_6_0_adsp_zephyr-elf.tar.xz"
+          sha256: "7baca1968f500dcdb9c94f70057824c0985315ef334a51e68b3edcb9a5c284ba"
+        xtensa-amd_acp_7_0_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-amd_acp_7_0_adsp_zephyr-elf.tar.xz"
+          sha256: "b5cbcf04e5cf022d1b09a009c2c673c3c792be4443a944caae3fd447698c0024"
+        xtensa-amd_acp_7_3_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-amd_acp_7_3_adsp_zephyr-elf.tar.xz"
+          sha256: "00053d7ce3eba5de278e7decf243f2357e0b367881cef3016f3d0f7d2434c70b"
+        xtensa-dc233c_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-dc233c_zephyr-elf.tar.xz"
+          sha256: "d5dcce629d7cc24b1d0a367447340c1d9fbcedc0a6ed99ee105c8f1fe87060b2"
+        xtensa-espressif_esp32_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-espressif_esp32_zephyr-elf.tar.xz"
+          sha256: "39f6bc4cd6d542b41a5189fb71869eea19bd54e73733d16f58d6615f3f7d66ae"
+        xtensa-espressif_esp32s2_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-espressif_esp32s2_zephyr-elf.tar.xz"
+          sha256: "816cef42c9ff6548e2c4efd526969610ba8e853c26978f0288b0ea83b4467d42"
+        xtensa-espressif_esp32s3_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-espressif_esp32s3_zephyr-elf.tar.xz"
+          sha256: "904d42b75e4d819c58b0db640783911e508b9ee2a627eb5daffb907465a34be1"
+        xtensa-intel_ace15_mtpm_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-intel_ace15_mtpm_zephyr-elf.tar.xz"
+          sha256: "f5a6c5b9e9f90a694277100fae2e7fbaa4fbafb7e3db96ed070ffb6551b9cc37"
+        xtensa-intel_ace30_ptl_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-intel_ace30_ptl_zephyr-elf.tar.xz"
+          sha256: "98a4416e9ec43483fca2c3810d1554da7fd4aa01fd84fa7da86883db4c3463d3"
+        xtensa-intel_ace40_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-intel_ace40_zephyr-elf.tar.xz"
+          sha256: "12725f49207bdd69f813362137de2f961bdb320dcec739de089aa2bee42cf436"
+        xtensa-intel_tgl_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-intel_tgl_adsp_zephyr-elf.tar.xz"
+          sha256: "3a69c82e1efbdf158b5a57cba633bff398c561fbbf1473138ed51e8ab27bbc6c"
+        xtensa-mtk_mt818x_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-mtk_mt818x_adsp_zephyr-elf.tar.xz"
+          sha256: "f20089e7d324e017c930e37e66082e70771b85b52e5ba1183dd3bfe35ef649b9"
+        xtensa-mtk_mt8195_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-mtk_mt8195_adsp_zephyr-elf.tar.xz"
+          sha256: "b60f15fb92b4ecbe0124b82906b368a36d68ff79c26ce2a89198e3f1d2763e77"
+        xtensa-mtk_mt8196_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-mtk_mt8196_adsp_zephyr-elf.tar.xz"
+          sha256: "cc13f05236de66cbdbbd317bed72d116edb3ecfcf6febf1c59bd5546f7b32a3f"
+        xtensa-mtk_mt8365_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-mtk_mt8365_adsp_zephyr-elf.tar.xz"
+          sha256: "ac6461fb35693391abc5370f7de9f0f1b77b8de850b04e0730efba8c1dfff13b"
+        xtensa-nxp_imx8m_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz"
+          sha256: "289ae3a30ab054d58cec15a0f6c87ac8e1884fb22967d1214fc4058c8281fde2"
+        xtensa-nxp_imx8ulp_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-nxp_imx8ulp_adsp_zephyr-elf.tar.xz"
+          sha256: "8831e43ba4f035931e7542573fdf56cb10d273bc607d28e3c6032049f20c8e87"
+        xtensa-nxp_imx_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz"
+          sha256: "ff4b9c29bab945de4b71c4f073b11a90e1c346f8932770a0422edc71915c0e9c"
+        xtensa-nxp_rt500_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-nxp_rt500_adsp_zephyr-elf.tar.xz"
+          sha256: "d988e30c1cd0ffc930dcf4f2fb71dd2de2d4800bc3b519097be2f09ec4f4b3ca"
+        xtensa-nxp_rt600_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-nxp_rt600_adsp_zephyr-elf.tar.xz"
+          sha256: "8ee35aad43b9e511b217009b3574bd8d7b759127e2c3543ca9871c96f5150904"
+        xtensa-nxp_rt700_hifi1_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-nxp_rt700_hifi1_zephyr-elf.tar.xz"
+          sha256: "3232278453632546dcb558501bb9b9e32b9b172d9d7e6e1d8013bea7c9ac9413"
+        xtensa-nxp_rt700_hifi4_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-nxp_rt700_hifi4_zephyr-elf.tar.xz"
+          sha256: "780019acad7bbff994bf3f10ffe1b393cccbecbbc10f315e63709f31886feb5e"
+        xtensa-sample_controller32_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-sample_controller32_zephyr-elf.tar.xz"
+          sha256: "bf8fb58e4a7a7898bc612f4c10612e6637a1fe8e45f127a5192021ff8f88b856"
+        xtensa-sample_controller_zephyr-elf:
+          file: "toolchain_gnu_linux-x86_64_xtensa-sample_controller_zephyr-elf.tar.xz"
+          sha256: "2342c6e1f572d0b6ba6c50b8bbb332592a78ecfb132f0579858f5ca0a11b650f"
+      linux-aarch64:
+        aarch64-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_aarch64-zephyr-elf.tar.xz"
+          sha256: "b3f217b7e099509e44d4eb98a0776f4782a05dfc8936b6dcbd2946134d0e13c3"
+        arc-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_arc-zephyr-elf.tar.xz"
+          sha256: "ed1e57729078a8f59f7d82986d6d8943ef9e4a2b62589a08189a49f9ffb5480c"
+        arc64-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_arc64-zephyr-elf.tar.xz"
+          sha256: "1f1dfc17db827004d11a5a9f29edb887371d98d039ad0a459ba5a867a640d448"
+        arm-zephyr-eabi:
+          file: "toolchain_gnu_linux-aarch64_arm-zephyr-eabi.tar.xz"
+          sha256: "b9805b691f2f0a8926c92694cae378d05ba07b76abca745e216fcc52753cc4d6"
+        microblazeel-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_microblazeel-zephyr-elf.tar.xz"
+          sha256: "da588bc52843f1b21217db406196317666b254d72c296eadb672935c0fcda96c"
+        mips-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_mips-zephyr-elf.tar.xz"
+          sha256: "369ad0f716bff71ee6ffca2fb2da2f318081368cfca67678a98ee92f2950636d"
+        or1k-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_or1k-zephyr-elf.tar.xz"
+          sha256: "bcc16417323500290bf0e6ffe182f8a02c6f2d2065d637169bcdb60c5f7ccc40"
+        riscv64-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_riscv64-zephyr-elf.tar.xz"
+          sha256: "7000feff1cdcf872b88bb987696035aab0807b566e9a9842881438187df6e848"
+        rx-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_rx-zephyr-elf.tar.xz"
+          sha256: "46c80d9ece990949b6b8b9d0c5cd17bc7922dc8f08f7b91efe42bc2c612ce84a"
+        sparc-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_sparc-zephyr-elf.tar.xz"
+          sha256: "f3c9d6cda48f920f235299a21f1f3741012e4256ff5de22ae0c0a455a5448f8b"
+        x86_64-zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_x86_64-zephyr-elf.tar.xz"
+          sha256: "5d7c7dda380d8687039271fe4973a739de2b7e99ba0d47a3e0634c1678761ef7"
+        xtensa-amd_acp_6_0_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-amd_acp_6_0_adsp_zephyr-elf.tar.xz"
+          sha256: "6942e55e923717ec9112d91d0e38eb729e0fcfd173368f601a23b07e9b53f015"
+        xtensa-amd_acp_7_0_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-amd_acp_7_0_adsp_zephyr-elf.tar.xz"
+          sha256: "91cd974f4efd9f8a056bc72a7ecc1cf8c2e039ef2c7d4cc20a37f7910d1ffd78"
+        xtensa-amd_acp_7_3_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-amd_acp_7_3_adsp_zephyr-elf.tar.xz"
+          sha256: "6b6d892f544a4e5e67022501f2ce5a309cfcb8872dd79ce897d7ab54b7061f0b"
+        xtensa-dc233c_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-dc233c_zephyr-elf.tar.xz"
+          sha256: "4331aa614b2b5b84e3595ba635a0d0422c4092662dc0e5b1aceab83486891dae"
+        xtensa-espressif_esp32_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-espressif_esp32_zephyr-elf.tar.xz"
+          sha256: "6e7d427a4a326ca91bacaae695b332d207ba9ef439a1c26607da5b7ae1dba8cc"
+        xtensa-espressif_esp32s2_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-espressif_esp32s2_zephyr-elf.tar.xz"
+          sha256: "c3e7778e200653d2ea35877de688d99724711760c29b86c63371255e40debf83"
+        xtensa-espressif_esp32s3_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-espressif_esp32s3_zephyr-elf.tar.xz"
+          sha256: "093f2b6025ecf539a8601aed08420d3fdf224889c0ecd7892de9a816deb1d5e9"
+        xtensa-intel_ace15_mtpm_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-intel_ace15_mtpm_zephyr-elf.tar.xz"
+          sha256: "5840c1481b17ff3cf40b537bd19607df516e4f2b07c6345543d3ef9beb6f3337"
+        xtensa-intel_ace30_ptl_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-intel_ace30_ptl_zephyr-elf.tar.xz"
+          sha256: "3e830f65e6690f3c8cf0f192bc8fac0ee6bfcca7fa081f861e6fad1222ba76f1"
+        xtensa-intel_ace40_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-intel_ace40_zephyr-elf.tar.xz"
+          sha256: "6edb730187d066f77ad6bb0b9416a6e7010e3532c80ed38b102612cc5cd899b3"
+        xtensa-intel_tgl_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-intel_tgl_adsp_zephyr-elf.tar.xz"
+          sha256: "cbdbb90b038c5cfbdd0c0c175d3e295aa688bc2b4be2a3dffc5b2acf4c9710bc"
+        xtensa-mtk_mt818x_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-mtk_mt818x_adsp_zephyr-elf.tar.xz"
+          sha256: "e23787ebf6ac366fcc74dd9d3a5150eae3259bcfdc441bf8bb83b57e8d7df040"
+        xtensa-mtk_mt8195_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-mtk_mt8195_adsp_zephyr-elf.tar.xz"
+          sha256: "a4be0772b8f6e86e7b0728d373879984f8f42dcf1e68887f9db7de0785e8e277"
+        xtensa-mtk_mt8196_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-mtk_mt8196_adsp_zephyr-elf.tar.xz"
+          sha256: "c76a9b7636351aea6b881bac418c8e5a5041e1ad4973bbe63e125b997735e964"
+        xtensa-mtk_mt8365_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-mtk_mt8365_adsp_zephyr-elf.tar.xz"
+          sha256: "c5a7fcc41a0269868fe4c22b0b418a59e82a2c6fc40f01df54eeda4c7a1f691d"
+        xtensa-nxp_imx8m_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz"
+          sha256: "ccda9fef9bf5af9057910df05579360e2f4e165c55389a16924d42df98bb9ae6"
+        xtensa-nxp_imx8ulp_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-nxp_imx8ulp_adsp_zephyr-elf.tar.xz"
+          sha256: "eab177b50aaa894e4887ac3d54fd5ce0fe275e80e9083cc5ee5ab12a79872359"
+        xtensa-nxp_imx_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz"
+          sha256: "b7a8e865930093edbdf650f6327891768fc705791a2ebf0e214bfe24bba56d75"
+        xtensa-nxp_rt500_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-nxp_rt500_adsp_zephyr-elf.tar.xz"
+          sha256: "5a512935e5b493be91f6a17631cb4c2f4da06979402ea85b9f40491e33ff4fd6"
+        xtensa-nxp_rt600_adsp_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-nxp_rt600_adsp_zephyr-elf.tar.xz"
+          sha256: "975fe77fbed576cd3d35278ba526d4ca11d8a1e2bb4863be0b31ef4cc630159c"
+        xtensa-nxp_rt700_hifi1_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-nxp_rt700_hifi1_zephyr-elf.tar.xz"
+          sha256: "e811df2431737f7429629db8432c7de5005bf34f14b305a865d17126855c65c0"
+        xtensa-nxp_rt700_hifi4_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-nxp_rt700_hifi4_zephyr-elf.tar.xz"
+          sha256: "c5ecdd50ff08e6384dbd8a5f107268a4aa9aa0d5a15df22529bb4e190bd94585"
+        xtensa-sample_controller32_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-sample_controller32_zephyr-elf.tar.xz"
+          sha256: "d59e9efd45f4b6bffa9c37cabbbb4342d54c4daadf401dd06d33ff60a0cb9c58"
+        xtensa-sample_controller_zephyr-elf:
+          file: "toolchain_gnu_linux-aarch64_xtensa-sample_controller_zephyr-elf.tar.xz"
+          sha256: "4ac73388a5fac7b37ba1e3ea7e416019377d7faa31bf1de7613a6f10b5de1cac"
+      macos-aarch64:
+        aarch64-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_aarch64-zephyr-elf.tar.xz"
+          sha256: "5a8778bff5b80d1547c1d926287eb79b3d5b6345353a6df992caa937858d8873"
+        arc-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_arc-zephyr-elf.tar.xz"
+          sha256: "b3fbd56e8920a9a65230ed34de1d4af47bbb2411a6e45c4ae25f1830be039f1f"
+        arc64-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_arc64-zephyr-elf.tar.xz"
+          sha256: "03de85ef8827481b817b26e39fd84f0b934b6c08cf6d1eb9875a0986325b04ad"
+        arm-zephyr-eabi:
+          file: "toolchain_gnu_macos-aarch64_arm-zephyr-eabi.tar.xz"
+          sha256: "4008edb5d4840cd994aedd7f1309bfb63e7243729d57839ebf1cc83c1f17c886"
+        microblazeel-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_microblazeel-zephyr-elf.tar.xz"
+          sha256: "e8ff680411fcabac69fe5f2e9657bab3373a42500be1f597a5c6b31dc3341628"
+        mips-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_mips-zephyr-elf.tar.xz"
+          sha256: "7e297659f03057d51038de8204d8b5335acba13c9cf358ee11d6c41b9f55c05b"
+        or1k-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_or1k-zephyr-elf.tar.xz"
+          sha256: "cd2122dd2ef86455ba2e350e7d5e7db67304ea8824d2ae50da6a4aefb0c97364"
+        riscv64-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_riscv64-zephyr-elf.tar.xz"
+          sha256: "bc9026ee24c34d79f89bb9f1eb7f86a60232ed8eb1b85d301178482f6544cee7"
+        rx-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_rx-zephyr-elf.tar.xz"
+          sha256: "84a3d29ef104945292ec5e8fcffd592389fa6f5ff251637b4a6268ebe6b6b8ab"
+        sparc-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_sparc-zephyr-elf.tar.xz"
+          sha256: "2222bec6481681ccb9c6616233c973e5bd72f3c8f3cafc77c5fd25335482c2ba"
+        x86_64-zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_x86_64-zephyr-elf.tar.xz"
+          sha256: "458f021febaa2afb2bc427d9d884facda3023044645aaa54539dc996c0d34776"
+        xtensa-amd_acp_6_0_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-amd_acp_6_0_adsp_zephyr-elf.tar.xz"
+          sha256: "ca1a091a30efc2157187f2e891b29e590b1f7072904a24aaf956a31ef5aed393"
+        xtensa-amd_acp_7_0_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-amd_acp_7_0_adsp_zephyr-elf.tar.xz"
+          sha256: "54599605be36f76ac7c3d853103c50cb8001d58a4031b29bbb65b8fbedd0e7cb"
+        xtensa-amd_acp_7_3_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-amd_acp_7_3_adsp_zephyr-elf.tar.xz"
+          sha256: "59fd6ec1a0a567621f4cf6d528027e441acdc8a5f22c4a7f467e40842be9b69f"
+        xtensa-dc233c_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-dc233c_zephyr-elf.tar.xz"
+          sha256: "ec850b628a601952d7886629e3ab0f6765ae33a9e7226d212e07bdce296eb4af"
+        xtensa-espressif_esp32_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-espressif_esp32_zephyr-elf.tar.xz"
+          sha256: "af35c1961e315b7066eebe0efe261dc198efa607690e246b9110b7e491799841"
+        xtensa-espressif_esp32s2_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-espressif_esp32s2_zephyr-elf.tar.xz"
+          sha256: "85b8e4dfd991ff9dfd1bd787a8f3d202c2a3e34e5407030e90f2941d0b2b59e1"
+        xtensa-espressif_esp32s3_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-espressif_esp32s3_zephyr-elf.tar.xz"
+          sha256: "ab5dd8044caa694a01544b8ff7dcb06a708dc2d40d58911bf4827bf7c7373b2d"
+        xtensa-intel_ace15_mtpm_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-intel_ace15_mtpm_zephyr-elf.tar.xz"
+          sha256: "782c5fd0308f29fe1e271f5518bb54013273cac05343987e3c82eb92c1a968e5"
+        xtensa-intel_ace30_ptl_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-intel_ace30_ptl_zephyr-elf.tar.xz"
+          sha256: "8434579e348d45ef991431168a3769ae5ea1b5a011ffd1026125eff39db567c6"
+        xtensa-intel_ace40_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-intel_ace40_zephyr-elf.tar.xz"
+          sha256: "10e3f66014b11e11c10ad7527c42b10d708cb91501a303724ebfa8398e1ee130"
+        xtensa-intel_tgl_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-intel_tgl_adsp_zephyr-elf.tar.xz"
+          sha256: "8f38a94b32ec8641f5277a3ec834b3a6633f490e4882c01c3c0af198a68fad56"
+        xtensa-mtk_mt818x_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-mtk_mt818x_adsp_zephyr-elf.tar.xz"
+          sha256: "5464d8825a22ef2a496d54133637fd5e4b12729d5f7b4ffe13c67725674ab87e"
+        xtensa-mtk_mt8195_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-mtk_mt8195_adsp_zephyr-elf.tar.xz"
+          sha256: "1598f4d9f882b360212e27a408364996a7279dc0f8749640c81e691886b47851"
+        xtensa-mtk_mt8196_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-mtk_mt8196_adsp_zephyr-elf.tar.xz"
+          sha256: "010fcf5dc2baf2623c3b44fe71bd7e027d36b462acfa6bb64d40e58b22a56a6a"
+        xtensa-mtk_mt8365_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-mtk_mt8365_adsp_zephyr-elf.tar.xz"
+          sha256: "18a3b7b4ceac236d95377165b92a2a4fccf00e2a8cd2d6ea13c4901e1c117f7f"
+        xtensa-nxp_imx8m_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz"
+          sha256: "1e287174c8d568d0a3da4f431ec1a168bee1d4de599365afb0a3751a4d2ab17b"
+        xtensa-nxp_imx8ulp_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-nxp_imx8ulp_adsp_zephyr-elf.tar.xz"
+          sha256: "090cf7c5c743b30c30246e9c624c277e79172278cb38e59b21b0c3fa8b4b3eaf"
+        xtensa-nxp_imx_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz"
+          sha256: "74a9a15dba28c114ebecc14c0503618f3c6fe6ae2472cc643f4fcea87ada8ba3"
+        xtensa-nxp_rt500_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-nxp_rt500_adsp_zephyr-elf.tar.xz"
+          sha256: "34c2882407eff3bdef5ba4deb58cfd4006f696aaa304e55b49669d8c082172b5"
+        xtensa-nxp_rt600_adsp_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-nxp_rt600_adsp_zephyr-elf.tar.xz"
+          sha256: "de16c2970c8780715d360ff30c49ea0a4adf5dcc0c26f3ce66f2ff1e7a4e848a"
+        xtensa-nxp_rt700_hifi1_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-nxp_rt700_hifi1_zephyr-elf.tar.xz"
+          sha256: "c3c5498ee782e8d8982d7b1ae72ad2e4346c0ae7837752109ca1dd53803b174d"
+        xtensa-nxp_rt700_hifi4_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-nxp_rt700_hifi4_zephyr-elf.tar.xz"
+          sha256: "d181108a74eaf8cdb22ae854db9ab48c974acc18751e1082a30a968fa8f91351"
+        xtensa-sample_controller32_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-sample_controller32_zephyr-elf.tar.xz"
+          sha256: "682cbb40bb9e4f1d3a2b11ebc2be6211c8f35979e689eb3fc6b020bfc6b03507"
+        xtensa-sample_controller_zephyr-elf:
+          file: "toolchain_gnu_macos-aarch64_xtensa-sample_controller_zephyr-elf.tar.xz"
+          sha256: "e4a43bd832ddf925280db0b1bc1d8775fd6554cca366c30048c9989b92656a6d"
+  "0.17.4":
+    base_url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.4"
+    minimal:
+      linux-x86_64:
+        file: "zephyr-sdk-0.17.4_linux-x86_64_minimal.tar.xz"
+        sha256: "a7258bf50c892c4669712b2aacdfcd5e303245bcf36cb458a296039a664594f5"
+      linux-aarch64:
+        file: "zephyr-sdk-0.17.4_linux-aarch64_minimal.tar.xz"
+        sha256: "477eadfd9284ea5f5da106d20165929914ec4ebaa7e45aaf2702931a1e86e78a"
+      macos-aarch64:
+        file: "zephyr-sdk-0.17.4_macos-aarch64_minimal.tar.xz"
+        sha256: "cc3d26aee46b4264e49f5ef85f72aca8622c30d62b6233ef495837d4303d7c2b"
+      macos-x86_64:
+        file: "zephyr-sdk-0.17.4_macos-x86_64_minimal.tar.xz"
+        sha256: "c413afc34367262e2fe109a9754340ee966f1f769deed78c2fe1d5475095b666"
+    hosttools:
+      linux-x86_64:
+        file: "hosttools_linux-x86_64.tar.xz"
+        sha256: "6b57d3787c66e57c434f00b25d4599b16264f34ae842e02aefe166e22b650f65"
+      linux-aarch64:
+        file: "hosttools_linux-aarch64.tar.xz"
+        sha256: "988bff0f4a5d64e9e4c118a990cc13179887a0fe744d82bc83098691d213c86a"
+    toolchains:
+      linux-x86_64:
+        aarch64-zephyr-elf:
+          file: "toolchain_linux-x86_64_aarch64-zephyr-elf.tar.xz"
+          sha256: "d3c3790cad0b7fe579dc892d7f5e84e07f67008f04f1334ed6f95a3db3f4e608"
+        arc-zephyr-elf:
+          file: "toolchain_linux-x86_64_arc-zephyr-elf.tar.xz"
+          sha256: "f3b627b591a5f5eb86eb8918da2e410bdfa1dd1318de77fb70a6ea4719487370"
+        arc64-zephyr-elf:
+          file: "toolchain_linux-x86_64_arc64-zephyr-elf.tar.xz"
+          sha256: "a5a4f9defa3b7618a518d7ee5687f5366b674f16527e1e08d675f97d2e031d7e"
+        arm-zephyr-eabi:
+          file: "toolchain_linux-x86_64_arm-zephyr-eabi.tar.xz"
+          sha256: "1b61084fe12076a3639aa2d028b5258f41eb3d0f7d46a16264949e1d213f1915"
+        microblazeel-zephyr-elf:
+          file: "toolchain_linux-x86_64_microblazeel-zephyr-elf.tar.xz"
+          sha256: "c31a438b49c332957e9e09c8556de2575910081f8c2bed44fd568c5cc4bab5ff"
+        mips-zephyr-elf:
+          file: "toolchain_linux-x86_64_mips-zephyr-elf.tar.xz"
+          sha256: "0b6c51f8771da434a338763eb4c764410b14a47c60fe0f9f9f9cea7f9d6e6b23"
+        nios2-zephyr-elf:
+          file: "toolchain_linux-x86_64_nios2-zephyr-elf.tar.xz"
+          sha256: "f8a5aa91ae3a710b02c789583f2fcc3ae2ed85835594a9f820d7f8f799c38aac"
+        riscv64-zephyr-elf:
+          file: "toolchain_linux-x86_64_riscv64-zephyr-elf.tar.xz"
+          sha256: "45995599378db070e5cc3849f32f84bd214d98844d8edca93e13cd72d2dbc50c"
+        rx-zephyr-elf:
+          file: "toolchain_linux-x86_64_rx-zephyr-elf.tar.xz"
+          sha256: "ed4637044bb01f4bc726692aa71aec7ff81a043f1ad3b57c657653f47a333ec3"
+        sparc-zephyr-elf:
+          file: "toolchain_linux-x86_64_sparc-zephyr-elf.tar.xz"
+          sha256: "b377081ad2f213db832aad00f6d07bce37a1d3dc4b7d8b72e5a93aabdf4a77e1"
+        x86_64-zephyr-elf:
+          file: "toolchain_linux-x86_64_x86_64-zephyr-elf.tar.xz"
+          sha256: "035f99f3f2f635fe2ea01ec133f550d7f7ea47409547a9013cc6750aa765eb37"
+        xtensa-amd_acp_6_0_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-amd_acp_6_0_adsp_zephyr-elf.tar.xz"
+          sha256: "a65b1e2e3e49d1b5a8e5f27812286a39bc87779a7a2442773dbc9bd19d3500f0"
+        xtensa-dc233c_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-dc233c_zephyr-elf.tar.xz"
+          sha256: "1a0f7e315cd7e41dd3700811b1cd30fdb10afa77a78a03c8d434553357091ff7"
+        xtensa-espressif_esp32_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-espressif_esp32_zephyr-elf.tar.xz"
+          sha256: "38dafa18211923c6a3184e78be96672c8ccb3346b2b0250715b56076b134c2a8"
+        xtensa-espressif_esp32s2_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-espressif_esp32s2_zephyr-elf.tar.xz"
+          sha256: "e68a02a8a409cc3eaa45e579c44c56ecaae488bc85bf27f3fdde0b3b84580289"
+        xtensa-espressif_esp32s3_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-espressif_esp32s3_zephyr-elf.tar.xz"
+          sha256: "ed2c737bb12d6b68fc13590f9e3abae6c4bc0a7bdd4b06e6a024f56ab4acd231"
+        xtensa-intel_ace15_mtpm_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-intel_ace15_mtpm_zephyr-elf.tar.xz"
+          sha256: "2a82f120df1ac6a74224e54582cf4f38c695a698accc7a92155c93f6b5057940"
+        xtensa-intel_ace30_ptl_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-intel_ace30_ptl_zephyr-elf.tar.xz"
+          sha256: "9a523efb732b35393aeac62c1d67d513d05f4d31b89bad2ffa1fe872bf6cabb8"
+        xtensa-intel_tgl_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-intel_tgl_adsp_zephyr-elf.tar.xz"
+          sha256: "9eb82fc197318715cbc6159b8fea87bb1443375d4433eae911e8c15d8b7de8b6"
+        xtensa-mtk_mt818x_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-mtk_mt818x_adsp_zephyr-elf.tar.xz"
+          sha256: "9f033afa3539ae629ca5716c5f7af7893839a79e2884e8f9b44c903493f3de41"
+        xtensa-mtk_mt8195_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-mtk_mt8195_adsp_zephyr-elf.tar.xz"
+          sha256: "8a115240b0771ad598abf9d0ebbb3f8219d940e3428023af65d687ebc8b7226b"
+        xtensa-mtk_mt8196_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-mtk_mt8196_adsp_zephyr-elf.tar.xz"
+          sha256: "3fc871ab3400df395d25a3764efd1515011abd93d0c59896b1077755d66aebbd"
+        xtensa-mtk_mt8365_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-mtk_mt8365_adsp_zephyr-elf.tar.xz"
+          sha256: "b06303eaeb4450a8a47e88f25cefbbd7fa8afa54129560c92e17b3def29e8a67"
+        xtensa-nxp_imx8m_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz"
+          sha256: "a26091efc493d0b57191e03ece0830d7681abe097ab3ad6e4d00bc51c5149ffa"
+        xtensa-nxp_imx8ulp_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-nxp_imx8ulp_adsp_zephyr-elf.tar.xz"
+          sha256: "4cfdda5a881468791f235c68e06f9ac7b3c8e725891d12b010e074b04281217e"
+        xtensa-nxp_imx_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz"
+          sha256: "36a414f2d3941002c4ac8d5f8f1e1f999223dffd37568da37d651a1a017cb799"
+        xtensa-nxp_rt500_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-nxp_rt500_adsp_zephyr-elf.tar.xz"
+          sha256: "826417446ff7d26955235886673c774dcc0c9a108286f437893f95e3d007bcd0"
+        xtensa-nxp_rt600_adsp_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-nxp_rt600_adsp_zephyr-elf.tar.xz"
+          sha256: "bd4a4173f863b9f99b46317efaa485ddd651f6ff1684e22fecd3184e509e5a6d"
+        xtensa-nxp_rt700_hifi1_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-nxp_rt700_hifi1_zephyr-elf.tar.xz"
+          sha256: "5c0162b1f1fb419f5367bc373911c27643ea797fab17d7a4fca193a61edebf59"
+        xtensa-nxp_rt700_hifi4_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-nxp_rt700_hifi4_zephyr-elf.tar.xz"
+          sha256: "8dbd260061e3fb05696bb19f026f6eeeb965eb37c0113a63bbfc040836b612c5"
+        xtensa-sample_controller32_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-sample_controller32_zephyr-elf.tar.xz"
+          sha256: "afe4e59c09756bbdc2e7d74e1a4f56b91418e83f94bc99d8a5b075ee3dc92aa6"
+        xtensa-sample_controller_zephyr-elf:
+          file: "toolchain_linux-x86_64_xtensa-sample_controller_zephyr-elf.tar.xz"
+          sha256: "9ff32829d29ee8d149d6db27671ae17ccf50b0d4fa6ba1ffac13d438a50a8af3"
+      linux-aarch64:
+        aarch64-zephyr-elf:
+          file: "toolchain_linux-aarch64_aarch64-zephyr-elf.tar.xz"
+          sha256: "ab177c3c038815651eb9b28066da61ab7a7ccbda642f9a021373198ac513b555"
+        arc-zephyr-elf:
+          file: "toolchain_linux-aarch64_arc-zephyr-elf.tar.xz"
+          sha256: "6fd145c35b10dbd01d7fc922d38c605f5eeb4e7ceec6509b5fe49b47effcf86a"
+        arc64-zephyr-elf:
+          file: "toolchain_linux-aarch64_arc64-zephyr-elf.tar.xz"
+          sha256: "b8e7f809f133fdf6d6c8df0fc7e1ccd7a51d277240b25e07c5e04287e1d18db8"
+        arm-zephyr-eabi:
+          file: "toolchain_linux-aarch64_arm-zephyr-eabi.tar.xz"
+          sha256: "697300f3426db31386537d02b56fc5f4de4b63a4b4da3c5492374c4da269d5d7"
+        microblazeel-zephyr-elf:
+          file: "toolchain_linux-aarch64_microblazeel-zephyr-elf.tar.xz"
+          sha256: "276731ee85b26b76791a7f8a764ff63c20bb21313755af35dfd926f3d51a5fa1"
+        mips-zephyr-elf:
+          file: "toolchain_linux-aarch64_mips-zephyr-elf.tar.xz"
+          sha256: "7d58b8d5fb3b074c7787fbfbbef976492c8e14e7da466e9772ccded9dd6b7efc"
+        nios2-zephyr-elf:
+          file: "toolchain_linux-aarch64_nios2-zephyr-elf.tar.xz"
+          sha256: "752854234b4b5ce3dad341ca4f03868e2d94846d7d18eaf5dec2fe1a31decaa2"
+        riscv64-zephyr-elf:
+          file: "toolchain_linux-aarch64_riscv64-zephyr-elf.tar.xz"
+          sha256: "099af4909e561dca27fa82123f770b59ca87290da44a8ea259bc1075c8e8816c"
+        rx-zephyr-elf:
+          file: "toolchain_linux-aarch64_rx-zephyr-elf.tar.xz"
+          sha256: "6f3aa058e5745ce5791b908a687ed3ba5aa464c433effbcd3a598b474f6fb40c"
+        sparc-zephyr-elf:
+          file: "toolchain_linux-aarch64_sparc-zephyr-elf.tar.xz"
+          sha256: "03e238e2f3ca36ccd3f7f023d419c9307240c5d5e4328f1d1bdf010abc1ebffa"
+        x86_64-zephyr-elf:
+          file: "toolchain_linux-aarch64_x86_64-zephyr-elf.tar.xz"
+          sha256: "457fbe60460c244773a8c7ceeadfa9630801c2e96c17089a4639b45dca67c8c1"
+        xtensa-amd_acp_6_0_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-amd_acp_6_0_adsp_zephyr-elf.tar.xz"
+          sha256: "87eb281e1afe9a446a369d6c97a5b3204c548181ae213dfa9607458118bccc8a"
+        xtensa-dc233c_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-dc233c_zephyr-elf.tar.xz"
+          sha256: "a77c250a1509936a2a908dccbea3e5cbb3c2157da30228d49083172087eb9bf9"
+        xtensa-espressif_esp32_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-espressif_esp32_zephyr-elf.tar.xz"
+          sha256: "5aeb54231c85e750c551dfbfe66d5141d637e79983c897bc784e2c83474de323"
+        xtensa-espressif_esp32s2_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-espressif_esp32s2_zephyr-elf.tar.xz"
+          sha256: "79c4ddfbbf18e9648085f2709d618f0cb2c2fd8f57fc4c853f951224b21bc974"
+        xtensa-espressif_esp32s3_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-espressif_esp32s3_zephyr-elf.tar.xz"
+          sha256: "d02ad2a543358d1fc3104c5a29d1ba59fc76720b7fc6d26689cd6dfca060bfe3"
+        xtensa-intel_ace15_mtpm_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-intel_ace15_mtpm_zephyr-elf.tar.xz"
+          sha256: "4866bfee3d3465db18c104b65da98b19a8da4cce567024df8b9fb2e8ab33d385"
+        xtensa-intel_ace30_ptl_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-intel_ace30_ptl_zephyr-elf.tar.xz"
+          sha256: "40f550d4f8e9d88f0803dc7c791463d32745fedf5de4c8a83d03288ee6605693"
+        xtensa-intel_tgl_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-intel_tgl_adsp_zephyr-elf.tar.xz"
+          sha256: "cbf38825c49812efa8f59ddeb454254e9aad48e5e23b364960dacc459e2f8daf"
+        xtensa-mtk_mt818x_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-mtk_mt818x_adsp_zephyr-elf.tar.xz"
+          sha256: "b5e958014d71d3f97d55c4889e9c8e5564d9b29b8690505a0ae36d631c4579bc"
+        xtensa-mtk_mt8195_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-mtk_mt8195_adsp_zephyr-elf.tar.xz"
+          sha256: "558dd4d7c4aadb3de893b22898aa32a6d9dc33ce2005fdf35fa5b8b61c01aac6"
+        xtensa-mtk_mt8196_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-mtk_mt8196_adsp_zephyr-elf.tar.xz"
+          sha256: "22262f99720dd69d9cfb3de5c8bbcdef0310869a132784cdfb1bb4a22b3990a1"
+        xtensa-mtk_mt8365_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-mtk_mt8365_adsp_zephyr-elf.tar.xz"
+          sha256: "16efaba20182eb165e5f2264a2923e065834acabc14b47119ef7dc5ebba204d4"
+        xtensa-nxp_imx8m_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz"
+          sha256: "06a808eaa1d3e678b2b5db6e7310c95b272c67527b71388046432db18f7592cf"
+        xtensa-nxp_imx8ulp_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-nxp_imx8ulp_adsp_zephyr-elf.tar.xz"
+          sha256: "4f68f9d403b99c54e358f4ee48620e3407cc997765755ff4f53fa20b5be2353d"
+        xtensa-nxp_imx_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz"
+          sha256: "9ba72a3d71bf02bb72918fe600ed51297dff4471db6d7aea569e4817362b809a"
+        xtensa-nxp_rt500_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-nxp_rt500_adsp_zephyr-elf.tar.xz"
+          sha256: "b13d04a161ac1c3004ccd22b55b8508bbb42e64dd667ffaf5304b74bce3190e6"
+        xtensa-nxp_rt600_adsp_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-nxp_rt600_adsp_zephyr-elf.tar.xz"
+          sha256: "9475fc8690c66b487d82fe34492c21943a1c3b23a8532b8f2b44c053c33125c0"
+        xtensa-nxp_rt700_hifi1_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-nxp_rt700_hifi1_zephyr-elf.tar.xz"
+          sha256: "2ea5aaf4f5b12aad164bf4c453e18f0efe6a93a0208e9e77e8e70bf9ae4d26ed"
+        xtensa-nxp_rt700_hifi4_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-nxp_rt700_hifi4_zephyr-elf.tar.xz"
+          sha256: "857ffd120af6fee573afbc7f29ec0519d2643a9613588c70eb9f6f3488bad1b9"
+        xtensa-sample_controller32_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-sample_controller32_zephyr-elf.tar.xz"
+          sha256: "050f51252798e72d9da6e0cfcc74b114cda1c2c77237f693ee857be334cbabe8"
+        xtensa-sample_controller_zephyr-elf:
+          file: "toolchain_linux-aarch64_xtensa-sample_controller_zephyr-elf.tar.xz"
+          sha256: "d804ea500c799e65b1f58ebae4d5bbf8420087453fc7ecb4ee7b842ff901dcb6"
+      macos-aarch64:
+        aarch64-zephyr-elf:
+          file: "toolchain_macos-aarch64_aarch64-zephyr-elf.tar.xz"
+          sha256: "189b14f871513d2c9aaa38beee95462d6e62a161c212a076ec1413224295313f"
+        arc-zephyr-elf:
+          file: "toolchain_macos-aarch64_arc-zephyr-elf.tar.xz"
+          sha256: "e324407c86c5b004ad995a6960e8d2db0eb828b85264b483dbf76df06cba90bc"
+        arc64-zephyr-elf:
+          file: "toolchain_macos-aarch64_arc64-zephyr-elf.tar.xz"
+          sha256: "6c3356a1d8d52dc5c96ee6394e583233452c3886f2f5803b194db8087e8d9699"
+        arm-zephyr-eabi:
+          file: "toolchain_macos-aarch64_arm-zephyr-eabi.tar.xz"
+          sha256: "c0fbf111d2232dd533d813f49ddfbcc45014c4e2da7f2a17bf80599ac5bfbdeb"
+        microblazeel-zephyr-elf:
+          file: "toolchain_macos-aarch64_microblazeel-zephyr-elf.tar.xz"
+          sha256: "c78d7a6512b92bba064215ad44b568e56cc7655e8ccabfbe30f31509ee9dcb87"
+        mips-zephyr-elf:
+          file: "toolchain_macos-aarch64_mips-zephyr-elf.tar.xz"
+          sha256: "1eebcf64446d4ca87cb561c01f01b6cfc9d18165da17e4aa2a8b6e44888d66c9"
+        nios2-zephyr-elf:
+          file: "toolchain_macos-aarch64_nios2-zephyr-elf.tar.xz"
+          sha256: "b21ed14b4db26f72f381b13745c3235b670abbfb4582d2f497fd8d291d1149c2"
+        riscv64-zephyr-elf:
+          file: "toolchain_macos-aarch64_riscv64-zephyr-elf.tar.xz"
+          sha256: "dacd44301b368acefc4982a077e93c0f62bf98b40f21d7ec4d31661fcc0823d5"
+        rx-zephyr-elf:
+          file: "toolchain_macos-aarch64_rx-zephyr-elf.tar.xz"
+          sha256: "ba70373c7d4aa14dfc96b21efcf38dbf348564deb484bf1fa99b70bc63d894c2"
+        sparc-zephyr-elf:
+          file: "toolchain_macos-aarch64_sparc-zephyr-elf.tar.xz"
+          sha256: "f901782a3e9c5c60ff015a0bfaed7e576703cfe0b14772dc7e45226cb692bde9"
+        x86_64-zephyr-elf:
+          file: "toolchain_macos-aarch64_x86_64-zephyr-elf.tar.xz"
+          sha256: "512fe00092c854a5f6cd5d905d00b4aac5fb0b73f9cd0cac7f94977ee736332a"
+        xtensa-amd_acp_6_0_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-amd_acp_6_0_adsp_zephyr-elf.tar.xz"
+          sha256: "e66c1e17708e23522eb314908601b7fecf24609cf54f03f43dd376499d1a498b"
+        xtensa-dc233c_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-dc233c_zephyr-elf.tar.xz"
+          sha256: "be0ddf2741d4fd906d00107d9de19112aec2c38c47b875b2462ea3705c36ef4c"
+        xtensa-espressif_esp32_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-espressif_esp32_zephyr-elf.tar.xz"
+          sha256: "2370e6dd336dd6e83e77fc863c45f76ea6a609825736c16423d5fd6d036d2a28"
+        xtensa-espressif_esp32s2_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-espressif_esp32s2_zephyr-elf.tar.xz"
+          sha256: "9f8448e36fac03ad7119704d38b3e3a3e7657a0c9cbd809ad538104c89d5e5c9"
+        xtensa-espressif_esp32s3_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-espressif_esp32s3_zephyr-elf.tar.xz"
+          sha256: "708293da553e8caa105238e29e09a64839899d6b7e9262af1a866d3e9db02e49"
+        xtensa-intel_ace15_mtpm_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-intel_ace15_mtpm_zephyr-elf.tar.xz"
+          sha256: "16f4779ea75fa7324ea725c69d4e4c45fead0c0fda7cbea7fa3e3ff4697d6c8c"
+        xtensa-intel_ace30_ptl_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-intel_ace30_ptl_zephyr-elf.tar.xz"
+          sha256: "2957064789a99a8ee11b77ba7dd2b1d6a98e9421be885b69f6848e92ff26a1d0"
+        xtensa-intel_tgl_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-intel_tgl_adsp_zephyr-elf.tar.xz"
+          sha256: "8d6aa4915be521500fd0c69df02e28f5d379cc77c7b8639d991e66bd7662be7d"
+        xtensa-mtk_mt818x_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-mtk_mt818x_adsp_zephyr-elf.tar.xz"
+          sha256: "3f2ad3d8db68dfcd8d89f01588ee961c785ffa73968cbbe0638e1c454ee6e058"
+        xtensa-mtk_mt8195_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-mtk_mt8195_adsp_zephyr-elf.tar.xz"
+          sha256: "2408ffb87ee8d54c849063a7a8eae858e583e27439af9ba9df1875848e117bb6"
+        xtensa-mtk_mt8196_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-mtk_mt8196_adsp_zephyr-elf.tar.xz"
+          sha256: "284279c78f361c817bdc9d83b4e7cfb4965b99d197fcf8f24249c7a0e9e77eeb"
+        xtensa-mtk_mt8365_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-mtk_mt8365_adsp_zephyr-elf.tar.xz"
+          sha256: "8454a4cece15926a8ae8a1648e76d317e350a4c03e8169c5e9681c46f2b8318f"
+        xtensa-nxp_imx8m_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz"
+          sha256: "71363ad57dc95a4843d73a083d44fbdc9ee45c368bc837e82d4f049602d68725"
+        xtensa-nxp_imx8ulp_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-nxp_imx8ulp_adsp_zephyr-elf.tar.xz"
+          sha256: "79c50905bd74985609a7b5c55180890165fa768b3907b21caff537742680eac4"
+        xtensa-nxp_imx_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz"
+          sha256: "2fec13c88a0c9491e9d70a85836c682a93d9770a633347992c5e39c69a6e00ef"
+        xtensa-nxp_rt500_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-nxp_rt500_adsp_zephyr-elf.tar.xz"
+          sha256: "cabaa24e443a2c0501a8c5fdb7ca538c1a929421722ccf77c66327704a80503a"
+        xtensa-nxp_rt600_adsp_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-nxp_rt600_adsp_zephyr-elf.tar.xz"
+          sha256: "3ba244b87e8173659927e34ba202d6c5c3b0b754760b462b75b1960d5b553334"
+        xtensa-nxp_rt700_hifi1_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-nxp_rt700_hifi1_zephyr-elf.tar.xz"
+          sha256: "162e73c45417e42c9cc072dd33a09afa774bd092a428e666930d4bfc67de8d5f"
+        xtensa-nxp_rt700_hifi4_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-nxp_rt700_hifi4_zephyr-elf.tar.xz"
+          sha256: "32ad42a63005a1e3115032239268cd15dead5809798379accc43552a225bdc8e"
+        xtensa-sample_controller32_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-sample_controller32_zephyr-elf.tar.xz"
+          sha256: "23229616bfb3caa8c571fb084dda3c43bc05a29fc4db59f4383bda1470f4e218"
+        xtensa-sample_controller_zephyr-elf:
+          file: "toolchain_macos-aarch64_xtensa-sample_controller_zephyr-elf.tar.xz"
+          sha256: "f2266ed3b2b873b06392290ac3a56eb871a729e61b7979ab4989c380f36f00ae"
+      macos-x86_64:
+        aarch64-zephyr-elf:
+          file: "toolchain_macos-x86_64_aarch64-zephyr-elf.tar.xz"
+          sha256: "2f2940b245eee2ba61f89987f7ee49d8c39c61313677122ea9c9399379112604"
+        arc-zephyr-elf:
+          file: "toolchain_macos-x86_64_arc-zephyr-elf.tar.xz"
+          sha256: "2b8c898c29fe5c870fe681bb772d5d23d6cbc79f76af8314cb1dac02ed421a0a"
+        arc64-zephyr-elf:
+          file: "toolchain_macos-x86_64_arc64-zephyr-elf.tar.xz"
+          sha256: "22989398dbe62bbf2cd5fad3e5f1c3d24a9058acafe0b342b403548f85b03155"
+        arm-zephyr-eabi:
+          file: "toolchain_macos-x86_64_arm-zephyr-eabi.tar.xz"
+          sha256: "25caef36014ee9597d60da3020511f7298f53b08663a0adce33a58d0a9e251bc"
+        microblazeel-zephyr-elf:
+          file: "toolchain_macos-x86_64_microblazeel-zephyr-elf.tar.xz"
+          sha256: "43a97ba60caa5c96da18347da4b0a6b24786aa0478949d5a48991361d05c4c5f"
+        mips-zephyr-elf:
+          file: "toolchain_macos-x86_64_mips-zephyr-elf.tar.xz"
+          sha256: "e8162d111e1c5e4b52ff4c0f8285839f9a5f5f8701a86f61605882f88216c0b1"
+        nios2-zephyr-elf:
+          file: "toolchain_macos-x86_64_nios2-zephyr-elf.tar.xz"
+          sha256: "b7ca981174870f3f68a48fbdc801692ee182f8e49de71354461d9e3def8d06fe"
+        riscv64-zephyr-elf:
+          file: "toolchain_macos-x86_64_riscv64-zephyr-elf.tar.xz"
+          sha256: "2aeb6f8a9f118c1927f9da549ddef03a8679eb26df87c7457f938b475b9b7217"
+        rx-zephyr-elf:
+          file: "toolchain_macos-x86_64_rx-zephyr-elf.tar.xz"
+          sha256: "061760f5845cb9d368732ac9d278e20a296d2c6355d8f5fe2f5e8c0f6b49ffe0"
+        sparc-zephyr-elf:
+          file: "toolchain_macos-x86_64_sparc-zephyr-elf.tar.xz"
+          sha256: "2667a2eb4b634845b5d982215df8f98f6bac4c0c565e211582c8fa7bb733dccd"
+        x86_64-zephyr-elf:
+          file: "toolchain_macos-x86_64_x86_64-zephyr-elf.tar.xz"
+          sha256: "f09f14e61f1f1c23805fa2d7baab4667506ddb6e0a011699b6ffde6c04cbe58f"
+        xtensa-amd_acp_6_0_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-amd_acp_6_0_adsp_zephyr-elf.tar.xz"
+          sha256: "f3ec9359efdbc2427808082681a7d62fc412ee08f93d123292ce031b3eacf59c"
+        xtensa-dc233c_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-dc233c_zephyr-elf.tar.xz"
+          sha256: "1725f2c333f0271dbd8fd52e9bcb4711ec600331fac51236b3cb47d06e139506"
+        xtensa-espressif_esp32_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-espressif_esp32_zephyr-elf.tar.xz"
+          sha256: "bdad6d120f8a8be9df9f700c27855b5f83ed71272a2d68ec7e964cded16d6bbb"
+        xtensa-espressif_esp32s2_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-espressif_esp32s2_zephyr-elf.tar.xz"
+          sha256: "8c46441de5e77bcc48b0135d1f6016ec14d5c1cf440569282e42ccfce30fa7b6"
+        xtensa-espressif_esp32s3_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-espressif_esp32s3_zephyr-elf.tar.xz"
+          sha256: "403c7a1f628700abb01e2b09cf8ae317a6f0c0d9a4faf32847e23c5eee1855fb"
+        xtensa-intel_ace15_mtpm_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-intel_ace15_mtpm_zephyr-elf.tar.xz"
+          sha256: "3e7b9d077a6505f8e90fed6096709b90915046896fd89ebd1802778e3e838a62"
+        xtensa-intel_ace30_ptl_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-intel_ace30_ptl_zephyr-elf.tar.xz"
+          sha256: "67d42a1728de951eca34935c2ccfe51088de72d735a0a315cca4313d93b27e89"
+        xtensa-intel_tgl_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-intel_tgl_adsp_zephyr-elf.tar.xz"
+          sha256: "24da4a6cd6389cd9848a2e9e31086a55f40a8b2f79b2cb08efab95ab219fac6e"
+        xtensa-mtk_mt818x_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-mtk_mt818x_adsp_zephyr-elf.tar.xz"
+          sha256: "cc2d3b10e9f6af7fc145480cd3cbeb6f7322f04e2313e2c5110fbdd74042452e"
+        xtensa-mtk_mt8195_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-mtk_mt8195_adsp_zephyr-elf.tar.xz"
+          sha256: "c8f4cbf973e98d556453b074e323ada8b876e0fc62bb736248f328a7d7fc9261"
+        xtensa-mtk_mt8196_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-mtk_mt8196_adsp_zephyr-elf.tar.xz"
+          sha256: "64cea31d5868a42329fd88a16091ebd30e57fbaef1dbbf9857e590a490d4d5c9"
+        xtensa-mtk_mt8365_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-mtk_mt8365_adsp_zephyr-elf.tar.xz"
+          sha256: "917f8ab34d1c22204e1833a3a52b8257644430ca7ff5ca089663ad4c6033f1f0"
+        xtensa-nxp_imx8m_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-nxp_imx8m_adsp_zephyr-elf.tar.xz"
+          sha256: "0f93903eed36bf34f4eae29a13f50aaa0fa782c2fc46ca59159633c053676cd4"
+        xtensa-nxp_imx8ulp_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-nxp_imx8ulp_adsp_zephyr-elf.tar.xz"
+          sha256: "eb02fb19aee43e2c064ce61238fa892e6db826bf2feb3e60dcb8c5e266df6ffe"
+        xtensa-nxp_imx_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz"
+          sha256: "a18239a85299f6fa908698d983c94250876b93a9b71ac7ba126281853ab94514"
+        xtensa-nxp_rt500_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-nxp_rt500_adsp_zephyr-elf.tar.xz"
+          sha256: "50289c0beaec8dab35a8de5350ccca888d265fd674e4f9b2b1ff13a7a3f8ba2a"
+        xtensa-nxp_rt600_adsp_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-nxp_rt600_adsp_zephyr-elf.tar.xz"
+          sha256: "7e48e9c6a41bdb08406cc4f724367ebf5487a746f75ba063f0a090b3e40df824"
+        xtensa-nxp_rt700_hifi1_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-nxp_rt700_hifi1_zephyr-elf.tar.xz"
+          sha256: "6c1dcf7b21550b2d7b2e6006bd854be8c03bcb30d7d926b322b4ca79c2fa9788"
+        xtensa-nxp_rt700_hifi4_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-nxp_rt700_hifi4_zephyr-elf.tar.xz"
+          sha256: "ab35e416c010d767623edead015b87eb1a612cb661749eefffa0b60a6a9f3c82"
+        xtensa-sample_controller32_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-sample_controller32_zephyr-elf.tar.xz"
+          sha256: "d0d8ab984756c80320540f0163ad103537b32d4f3a5daee7bb59c57eb129e2bf"
+        xtensa-sample_controller_zephyr-elf:
+          file: "toolchain_macos-x86_64_xtensa-sample_controller_zephyr-elf.tar.xz"
+          sha256: "d05242147002f9140f756d47c8e094b2e5dc3ac2d66a56477f7b2d5b1911e21a"

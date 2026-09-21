@@ -1,0 +1,7 @@
+sources:
+  "4.4.0":
+    url: "https://github.com/zephyrproject-rtos/zephyr"
+    revision: "v4.4.0"
+  "4.3.0":
+    url: "https://github.com/zephyrproject-rtos/zephyr"
+    revision: "v4.3.0"
