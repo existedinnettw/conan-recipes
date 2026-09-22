@@ -19,20 +19,19 @@ board selection, Kconfig, devicetree, MCUboot, signing and flashing.
 ## What is *not* in the package
 
 * **Zephyr SDK / toolchain.** Provided by the separate `zephyr-sdk` recipe
-  (`tool_requires("zephyr-sdk/1.0.1")`), or from the environment, e.g. the
-  `nix develop ~/nix-config#zephyr` shell, which sets `ZEPHYR_SDK_INSTALL_DIR`
-  and `ZEPHYR_TOOLCHAIN_VARIANT`. Zephyr never
+  (`tool_requires("zephyr-sdk/1.0.1")`), or from the environment via
+  `ZEPHYR_SDK_INSTALL_DIR` and `ZEPHYR_TOOLCHAIN_VARIANT`. Zephyr never
   receives Conan's `conan_toolchain.cmake`; its own toolchain logic stays in
   charge.
 * **west and Zephyr's Python requirements.** Needed both to build this
-  package (`west update`) and to consume it (`west build`). The nix shell
-  provides them.
+  package (`west update`) and to consume it (`west build`); install them into
+  a virtualenv on `PATH` (e.g. `pip install west ninja` plus
+  `zephyr/scripts/requirements-base.txt`).
 * `.git` metadata (unless `keep_git=True`). `west build` does not need it,
   `west update` inside the package will not work.
 
 The SDK major version must match the Zephyr release: Zephyr 4.3 wants SDK
-0.17.x, Zephyr 4.4 wants SDK 1.0.x (the current nix shell ships 1.0.1, so
-only `zephyr/4.4.0` passes the test package there).
+0.17.x, Zephyr 4.4 wants SDK 1.0.x.
 
 ## Options
 
@@ -78,3 +77,31 @@ class Firmware(ConanFile):
 
 * env `ZEPHYR_BASE=<pkg>/zephyr` (build and run env)
 * conf `user.zephyr:base`, `user.zephyr:workspace`
+
+It deliberately sets `cmake_find_mode=none`: this package is not a CMake
+library, and a CMakeDeps-generated `zephyr-config.cmake` sitting on
+`CMAKE_PREFIX_PATH` would shadow Zephyr's own `find_package(Zephyr)`.
+
+## Adding ordinary C++ libraries to the firmware
+
+Zephyr consumes Conan libraries through plain `find_package()`; the working
+pattern (see `cpp_garage/zephyr_conan` and `zephyr_conan_sysbuild`) is:
+
+* `generate()` runs only `CMakeDeps` (never `CMakeToolchain`) and prepends
+  the generators folder to the **`CMAKE_PREFIX_PATH` environment variable**.
+  Environment, not `-D`, so the same setup works under `west build --sysbuild`,
+  which does not forward `-DCMAKE_*` to the images it configures.
+* CMakeDeps insists on `CMAKE_BUILD_TYPE`, Zephyr leaves it unset and would
+  inherit CMake's `-O3 -DNDEBUG` defaults if it were set on the command line.
+  Generate a two-file Zephyr module (`zephyr/module.yml` + `CMakeLists.txt`
+  that force-sets `CMAKE_BUILD_TYPE`, blanks `CMAKE_<LANG>_FLAGS_<CONFIG>` and
+  sets `NO_BUILD_TYPE_WARNING`) and export it with `ZEPHYR_EXTRA_MODULES`.
+* The host profile is the board's ABI contract: `os=baremetal`, the SDK's gcc
+  via `tools.build:compiler_executables`, Zephyr's exact `-mcpu/-mthumb/
+  -specs=picolibc.specs/-fno-exceptions/-fno-rtti` flags in
+  `tools.build:cflags/cxxflags`, `*:fPIC=False` (Zephyr links `-fno-pic`),
+  `CMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY`, and `zephyr-sdk` in
+  `[tool_requires]` so every package in the graph is cross-compiled by it.
+* The SDK's `libstdc++` has no gthreads (`std::mutex`, `std::thread`,
+  `std::condition_variable` are absent, as Zephyr documents), so libraries
+  needing them (e.g. spdlog) only build for `native_sim`; `fmt` builds fine.

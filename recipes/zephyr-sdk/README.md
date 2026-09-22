@@ -15,7 +15,7 @@ firmware
 `ZEPHYR_TOOLCHAIN_VARIANT=zephyr` into the build environment, prepends the
 selected toolchains' `bin/` to `PATH`, and prepends the package to
 `CMAKE_PREFIX_PATH` so this SDK wins over any other same-version SDK visible
-to CMake (verified against the nix shell's own SDK). Nothing is registered in the CMake user
+to CMake (verified against a system-installed SDK of the same version). Nothing is registered in the CMake user
 package registry (no `setup.sh -c`); Zephyr's `FindZephyr-sdk.cmake` finds the
 SDK through the environment variable. Conan's `CMakeToolchain` is never
 involved; Zephyr keeps owning the toolchain file.

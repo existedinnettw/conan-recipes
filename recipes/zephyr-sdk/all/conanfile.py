@@ -141,6 +141,9 @@ class ZephyrSdkConan(ConanFile):
         self.cpp_info.includedirs = []
         self.cpp_info.libdirs = []
         self.cpp_info.bindirs = []
+        # Not a CMake library: never let CMakeDeps emit a zephyr-sdk-config.cmake.
+        self.cpp_info.set_property("cmake_find_mode", "none")
+        self.cpp_info.set_property("pkg_config_name", "none")
 
         sdk = self.package_folder
         # This is all Zephyr's FindZephyr-sdk.cmake needs; no CMake user-registry
@@ -148,7 +151,7 @@ class ZephyrSdkConan(ConanFile):
         self.buildenv_info.define_path("ZEPHYR_SDK_INSTALL_DIR", sdk)
         # Zephyr enumerates every Zephyr-sdk CMake package it can see and takes the
         # first match of the best version, so another installed SDK of the same
-        # version (e.g. one on nix's system prefix path) could shadow this one.
+        # version (e.g. one installed on a system prefix path) could shadow this one.
         # The CMAKE_PREFIX_PATH environment variable is searched before system
         # prefixes, which makes this package win. (<Pkg>_ROOT is not usable: the
         # hyphen in "Zephyr-sdk_ROOT" is not a valid shell variable name.)

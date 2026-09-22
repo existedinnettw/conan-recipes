@@ -18,8 +18,8 @@ class ZephyrConan(ConanFile):
     west-managed module such as HALs, CMSIS, MCUboot), so nothing about
     Zephyr's module graph has to be duplicated in Conan.
 
-    The Zephyr SDK is intentionally *not* part of this package. Provide it from
-    the environment (for example the nix dev shell) via
+    The Zephyr SDK is intentionally *not* part of this package. Provide it via
+    the ``zephyr-sdk`` recipe (``tool_requires``) or from the environment via
     ``ZEPHYR_SDK_INSTALL_DIR`` / ``ZEPHYR_TOOLCHAIN_VARIANT``.
 
     Consume it as an ordinary requirement (it ends up compiled into the firmware)::
@@ -83,8 +83,7 @@ class ZephyrConan(ConanFile):
         if missing:
             raise ConanInvalidConfiguration(
                 f"Building zephyr/{self.version} needs {', '.join(missing)} on PATH. "
-                "Enter the Zephyr development shell first "
-                "(e.g. `nix develop ~/nix-config#zephyr`) or `pip install west`."
+                "Install them first, e.g. `pip install west` in a virtualenv on PATH."
             )
 
     def source(self):
@@ -169,6 +168,12 @@ class ZephyrConan(ConanFile):
         self.cpp_info.includedirs = []
         self.cpp_info.libdirs = []
         self.cpp_info.bindirs = []
+        # This package is not a CMake library. Without this, CMakeDeps would
+        # generate a zephyr-config.cmake that shadows Zephyr's own
+        # ``find_package(Zephyr)`` package config once the generators folder
+        # is on CMAKE_PREFIX_PATH (which is how consumers expose spdlog & co).
+        self.cpp_info.set_property("cmake_find_mode", "none")
+        self.cpp_info.set_property("pkg_config_name", "none")
 
         zephyr_base = os.path.join(self.package_folder, "zephyr")
         # Lets both west (workspace discovery falls back to ZEPHYR_BASE) and
