@@ -64,7 +64,7 @@ jobs:
       - name: Install host build tools
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: build-essential gcc-14 g++-14 cmake ninja-build python3-venv graphviz crudini libelf-dev flex bison bc libssl-dev autoconf automake libtool libltdl-dev cpio
+          packages: build-essential gcc-14 g++-14 cmake ninja-build python3-venv graphviz crudini libelf-dev flex bison bc libssl-dev autoconf automake libtool libltdl-dev cpio device-tree-compiler gperf
           version: 1.0
           execute_install_scripts: true
 
@@ -85,6 +85,24 @@ jobs:
           test -n "$CONAN_LOGIN_USERNAME" || (echo "Missing secret: CONAN_LOGIN_USERNAME" && exit 1)
           test -n "$CONAN_PASSWORD" || (echo "Missing secret: CONAN_PASSWORD" && exit 1)
 
+      - name: Install Zephyr host tools (west)
+        run: |
+          # setup-conan installs Conan into a venv, and an active venv makes
+          # "pip install --user" impossible; install west into that same venv.
+          if [[ -n "${VENV_PIP:-}" ]]; then
+            pip=("$VENV_PIP" install)
+            echo "$(dirname "$VENV_PIP")" >> "$GITHUB_PATH"
+          else
+            pip=(python3 -m pip install --user --break-system-packages)
+            echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          fi
+          # Mirrors Zephyr's scripts/requirements-base.txt (minus windows-curses).
+          "${pip[@]}" \
+            "west>=1.2" pyelftools PyYAML pykwalify jsonschema canopen packaging \
+            "patool>=2.0.0" psutil pylink-square pyserial requests semver tqdm reuse \
+            anytree intelhex
+          echo "ZEPHYR_TOOLCHAIN_VARIANT=host" >> "$GITHUB_ENV"
+
       - name: Detect Conan profile
         run: |
           conan profile detect --force
@@ -98,7 +116,12 @@ jobs:
 
       - name: Build package
         run: |
-          conan create "${{ matrix.path }}" --version="${{ matrix.version }}" --build=missing
+          # Optional per-recipe flags for CI-only builds (e.g. restricting the module set).
+          extra_args=()
+          if [[ -f "${{ matrix.path }}/../ci-args" ]]; then
+            mapfile -t extra_args < <(grep -v "^\s*#" "${{ matrix.path }}/../ci-args" | sed "/^\s*$/d")
+          fi
+          conan create "${{ matrix.path }}" --version="${{ matrix.version }}" --build=missing "${extra_args[@]}"
 
       - name: Upload package revisions
         run: |

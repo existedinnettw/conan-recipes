@@ -1,0 +1,4 @@
+# One argument per line, appended to `conan create` by the CI/CD workflows.
+# A full west workspace is several GB; CI only needs to prove the recipe works.
+-o
+zephyr/*:projects=cmsis_6
