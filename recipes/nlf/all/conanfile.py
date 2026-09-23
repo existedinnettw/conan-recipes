@@ -76,6 +76,16 @@ class NlfConan(ConanFile):
 
         # GPU backends are auto-detected upstream (nvcc, Vulkan SDK). Turn them off so
         # the package does not depend on whatever happens to be on the build machine.
+        # TODO: GPU support.
+        # * CUDA: OptMathKernels needs nvcc plus cudart/cublas/cufft/cusolver, and
+        #   Conan Center has no CUDA toolkit package yet; see the open "cuda" issues at
+        #   https://github.com/conan-io/conan-center-index/issues?q=state%3Aopen%20label%3A%22cuda%22
+        #   and https://github.com/rymut/cuda-toolkit-conan-package.
+        # * Vulkan: vulkan-loader + tool_requires glslang (glslangValidator) from Conan
+        #   Center should cover it. The shaders install to share/optmathkernels/shaders,
+        #   which package() then has to keep and runenv_info expose through
+        #   OPTMATH_KERNELS_PATH. nlf only calls Vulkan on aarch64 today, but may on x86
+        #   later.
         tc.cache_variables["CMAKE_CUDA_COMPILER"] = ""
         tc.cache_variables["NLF_ENABLE_VULKAN"] = False
 
