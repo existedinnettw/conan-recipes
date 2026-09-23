@@ -1,0 +1,11 @@
+sources:
+  "cci.20260805":
+    nlf:
+      url: "https://github.com/n4hy/Modern-Computational-Nonlinear-Filtering/archive/78514f02c279465c4b83f8381baaa49e7575c5d7.tar.gz"
+      sha256: "ae8ca3d96befa82b050d7f39f09c6ea3ebb1c420687a5124f5c1c32d9cca3d64"
+    # OptMathKernels has no install rules of its own; nlf builds it from a sibling
+    # source tree and ships it inside its package. 817b643 is the commit upstream
+    # audited and adopted ("Post-v0.6.3 sync" in DEVELOPMENT_NOTES.md).
+    optmath:
+      url: "https://github.com/n4hy/OptimizedKernelsForRaspberryPi5_NvidiaCUDA/archive/817b643782e3bc721bf44f79de1cdf621a6620c2.tar.gz"
+      sha256: "50ae0b696266c24f0e67a25cdec5faeb0c1dd9364e62f74871b91ccd9f133607"
