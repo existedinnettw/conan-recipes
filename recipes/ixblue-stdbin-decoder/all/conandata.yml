@@ -1,0 +1,6 @@
+sources:
+  # Upstream's last tag, 0.2.0, predates the parser error-recovery fixes that
+  # master ships as 0.2.1 in package.xml/CHANGELOG, but 0.2.1 was never tagged.
+  "cci.20251105":
+    url: "https://github.com/ixblue/ixblue_stdbin_decoder/archive/17044896f2f5f9f5140a7049fc43bb7675736acd.tar.gz"
+    sha256: "d04f2bc6b482df02d08e72af72997902210fb8e462ce73ad24a2c4775b21896a"
