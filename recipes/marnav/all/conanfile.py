@@ -2,7 +2,7 @@ import os
 
 from conan import ConanFile
 from conan.tools.build import check_min_cppstd
-from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import copy, get, replace_in_file, rmdir
 
 
@@ -22,10 +22,12 @@ class MarnavConan(ConanFile):
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
+        "with_tools": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": True,
+        "with_tools": False,
     }
 
     @property
@@ -42,6 +44,13 @@ class MarnavConan(ConanFile):
         if self.options.shared:
             self.options.rm_safe("fPIC")
 
+    def requirements(self):
+        if self.options.with_tools:
+            # Only nmeatool uses these, and nothing of them reaches the libraries'
+            # headers or link interface.
+            self.requires("cxxopts/3.3.1", visible=False)
+            self.requires("fmt/11.2.0", visible=False)
+
     def validate(self):
         check_min_cppstd(self, 17)
 
@@ -52,10 +61,13 @@ class MarnavConan(ConanFile):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def generate(self):
+        CMakeDeps(self).generate()
+
         tc = CMakeToolchain(self)
-        # The command line tools pull in the bundled cxxopts and fmt, and the tests the
-        # bundled googletest and benchmark; only the libraries are packaged.
-        tc.cache_variables["ENABLE_TOOLS"] = False
+        # nmeatool and nmeasum; _patch_sources() swaps their bundled cxxopts and fmt
+        # for the Conan packages.
+        tc.cache_variables["ENABLE_TOOLS"] = bool(self.options.with_tools)
+        # The tests pull in the bundled googletest and benchmark.
         tc.cache_variables["ENABLE_EXAMPLES"] = False
         tc.cache_variables["ENABLE_TESTS"] = False
         tc.cache_variables["ENABLE_TESTS_BENCHMARK"] = False
@@ -73,6 +85,29 @@ class MarnavConan(ConanFile):
         # -Werror turns every new compiler warning into a build failure.
         replace_in_file(self, os.path.join(self.source_folder, "src", "CMakeLists.txt"),
                         "\t\t-Werror\n", "")
+
+        if self.options.with_tools:
+            # Upstream adds cxxopts and fmt from extern/ with FetchContent, and forces
+            # FMT_INSTALL so fmt would be installed into this package.
+            replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"),
+                            """	set(CXXOPTS_BUILD_EXAMPLES FALSE CACHE BOOL "" FORCE)
+	set(CXXOPTS_BUILD_TESTS FALSE CACHE BOOL "" FORCE)
+	FetchContent_Declare(cxxopts
+		URL "${CMAKE_CURRENT_SOURCE_DIR}/extern/cxxopts-3.3.0"
+		)
+	FetchContent_MakeAvailable(cxxopts)
+
+	set(FMT_INSTALL TRUE CACHE BOOL "" FORCE)
+	FetchContent_Declare(fmt
+		URL "${CMAKE_CURRENT_SOURCE_DIR}/extern/fmt-11.2.0"
+		)
+	FetchContent_MakeAvailable(fmt)
+""",
+                            """	find_package(cxxopts REQUIRED CONFIG)
+	find_package(fmt REQUIRED CONFIG)
+""")
+            replace_in_file(self, os.path.join(self.source_folder, "src", "nmeatool", "CMakeLists.txt"),
+                            "\t\tcxxopts\n", "\t\tcxxopts::cxxopts\n")
 
     def build(self):
         self._patch_sources()
