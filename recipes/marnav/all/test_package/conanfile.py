@@ -24,3 +24,9 @@ class TestPackageConan(ConanFile):
     def test(self):
         if can_run(self):
             self.run(os.path.join(self.cpp.build.bindir, "test_package"), env="conanrun")
+            marnav = self.dependencies[self.tested_reference_str]
+            if marnav.options.with_tools:
+                # A static library package is not a run requirement, so its bin
+                # folder is not on PATH.
+                self.run(os.path.join(marnav.package_folder, "bin", "nmeatool") + " --version",
+                         env="conanrun")
