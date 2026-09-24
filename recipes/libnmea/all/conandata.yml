@@ -1,0 +1,4 @@
+sources:
+  "cci.20221203":
+    url: "https://github.com/jacketizer/libnmea/archive/91fd4338a8f648de9b174d7aac954fedce8852aa.tar.gz"
+    sha256: "b34cf6838b49f42d8acfc389bd8ead4495c0ab879043e2640f68b7cc295beb9f"
