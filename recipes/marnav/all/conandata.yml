@@ -1,0 +1,4 @@
+sources:
+  "0.14.1":
+    url: "https://github.com/mariokonrad/marnav/archive/refs/tags/v0.14.1.tar.gz"
+    sha256: "7c47b6599db3f2f7dbdf42d72b090b635dc2234297eb602afc2416b4ba6c67b7"
