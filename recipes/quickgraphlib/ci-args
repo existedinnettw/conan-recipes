@@ -1,0 +1,11 @@
+# One argument per line, appended to `conan create` by the CI/CD workflows.
+# Qt 6.11 refuses to build in strict ISO mode (it needs __int128), and the runner's
+# profile uses compiler.cppstd=23; QuickGraphLib itself still builds as plain C++23.
+-s
+qt/*:compiler.cppstd=gnu23
+# xorg/system, opengl/system and xkeyboard-config/system need the X11, xcb and GL
+# development packages, which the runner does not have.
+-c
+tools.system.package_manager:mode=install
+-c
+tools.system.package_manager:sudo=True
