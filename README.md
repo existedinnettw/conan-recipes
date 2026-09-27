@@ -6,6 +6,7 @@ The goal of this repo is provide some **non-official** recipes for libraries tha
 
 * `ci.yml` validates only recipe/version targets changed by a pull request.
 * `cd.yml` runs on `main`, builds only changed recipe/version targets, and uploads only missing packages to the configured private Conan remote.
+* Changed recipes that reference each other (in `conanfile.py` or `test_package/conanfile.py`) are built in one job, dependencies first, after all of them are exported; so one pull request can add a recipe together with the recipes it needs. Unrelated recipes still get parallel jobs.
 * Populate secrets from `.env.ci.example` or `.env.ci` with `gh secret set -f .env.ci`.
 
 ## ref

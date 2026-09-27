@@ -192,6 +192,76 @@ def build_targets(base, head, mode):
     return matrix
 
 
+def recipe_dependencies(recipe, candidates, recipes_dir=None):
+    """Return the recipes in `candidates` that `recipe` (or its test package) references.
+
+    A plain text scan for "<name>/" string literals: it covers requires(),
+    tool_requires() and test_requires() with fixed versions and version ranges, and
+    it is only asked about recipes of this repository.
+    """
+    recipe_dir = (recipes_dir or RECIPES_DIR) / recipe / "all"
+    text = ""
+    for conanfile in (recipe_dir / "conanfile.py", recipe_dir / "test_package" / "conanfile.py"):
+        if conanfile.exists():
+            text += conanfile.read_text()
+    return {
+        other
+        for other in candidates
+        if other != recipe and re.search(rf"[\"']{re.escape(other)}/", text)
+    }
+
+
+def group_targets(targets, dependencies):
+    """Put targets whose recipes depend on each other into one ordered group.
+
+    Each group becomes one CI job that exports all of its recipes and then creates
+    them dependencies first, so a recipe can depend on one that is only added in the
+    same change. Unrelated recipes stay in separate, parallel jobs.
+    """
+    recipes = []
+    for target in targets:
+        if target["name"] not in recipes:
+            recipes.append(target["name"])
+    deps = {recipe: set(dependencies.get(recipe, ())) & set(recipes) for recipe in recipes}
+
+    parent = {recipe: recipe for recipe in recipes}
+
+    def find(recipe):
+        while parent[recipe] != recipe:
+            parent[recipe] = parent[parent[recipe]]
+            recipe = parent[recipe]
+        return recipe
+
+    for recipe, requirements in deps.items():
+        for requirement in requirements:
+            parent[find(recipe)] = find(requirement)
+
+    components = {}
+    for recipe in recipes:
+        components.setdefault(find(recipe), []).append(recipe)
+
+    groups = []
+    for members in components.values():
+        # Kahn's algorithm, taking the alphabetically first ready recipe each round so
+        # the order is stable. Recipes left in a cycle are appended alphabetically;
+        # exporting everything up front still lets them resolve each other.
+        ordered = []
+        remaining = sorted(members)
+        while remaining:
+            ready = [recipe for recipe in remaining if not (deps[recipe] - set(ordered))]
+            recipe = ready[0] if ready else remaining[0]
+            ordered.append(recipe)
+            remaining.remove(recipe)
+        groups.append(
+            {
+                "name": "+".join(ordered),
+                "targets": [target for recipe in ordered for target in targets if target["name"] == recipe],
+            }
+        )
+
+    return sorted(groups, key=lambda group: group["name"])
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", required=True)
@@ -204,8 +274,10 @@ def main():
     )
     args = parser.parse_args()
 
-    matrix = build_targets(args.base, args.head, args.conandata_mode)
-    payload = {"include": matrix}
+    targets = build_targets(args.base, args.head, args.conandata_mode)
+    names = {target["name"] for target in targets}
+    dependencies = {name: recipe_dependencies(name, names) for name in names}
+    payload = {"include": group_targets(targets, dependencies)}
     print(json.dumps(payload))
 
 

@@ -47,6 +47,7 @@ jobs:
           fi
 
   publish:
+    name: publish ${{ matrix.name }}
     needs: detect-targets
     if: needs.detect-targets.outputs.has_targets == 'true'
     runs-on: ubuntu-latest
@@ -114,18 +115,10 @@ jobs:
           conan remote login org "$CONAN_LOGIN_USERNAME" --password "$CONAN_PASSWORD"
           conan remote list
 
-      - name: Build package
-        run: |
-          # Optional per-recipe flags for CI-only builds (e.g. restricting the module set).
-          extra_args=()
-          if [[ -f "${{ matrix.path }}/../ci-args" ]]; then
-            mapfile -t extra_args < <(grep -v "^\s*#" "${{ matrix.path }}/../ci-args" | sed "/^\s*$/d")
-          fi
-          conan create "${{ matrix.path }}" --version="${{ matrix.version }}" --build=missing "${extra_args[@]}"
-
-      - name: Upload package revisions
-        run: |
-          conan upload "${{ matrix.reference }}" -r org --confirm
+      - name: Build and upload packages
+        env:
+          TARGETS: ${{ toJson(matrix.targets) }}
+        run: .github/scripts/build_recipe_group.sh --upload org "$TARGETS"
 
   no-targets:
     needs: detect-targets

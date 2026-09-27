@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import importlib.util
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -118,6 +119,104 @@ patches:
         self.assertEqual(DETECTOR.parse_conandata_versions(None), {})
         self.assertEqual(DETECTOR.parse_conandata_versions(""), {})
         self.assertEqual(DETECTOR.parse_conandata_versions("patches:\n  \"1.0.0\":\n"), {})
+
+
+def target(name, version="1.0"):
+    return {
+        "name": name,
+        "version": version,
+        "path": f"recipes/{name}/all",
+        "reference": f"{name}/{version}",
+    }
+
+
+class RecipeDependenciesTests(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.recipes = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def write(self, recipe, text, test_package=None):
+        recipe_dir = self.recipes / recipe / "all"
+        recipe_dir.mkdir(parents=True)
+        (recipe_dir / "conanfile.py").write_text(text)
+        if test_package is not None:
+            (recipe_dir / "test_package").mkdir()
+            (recipe_dir / "test_package" / "conanfile.py").write_text(test_package)
+
+    def dependencies(self, recipe, candidates):
+        return DETECTOR.recipe_dependencies(recipe, candidates, recipes_dir=self.recipes)
+
+    def test_requires_with_version_and_range(self):
+        self.write("app", 'self.requires("lib/1.0")\nself.tool_requires("tool/[>=2 <3]")\n')
+
+        self.assertEqual(self.dependencies("app", {"app", "lib", "tool", "other"}), {"lib", "tool"})
+
+    def test_test_package_requirements_count(self):
+        self.write("lib", "", test_package='self.tool_requires("generator/1.0")\n')
+
+        self.assertEqual(self.dependencies("lib", {"lib", "generator"}), {"generator"})
+
+    def test_name_prefix_is_not_a_dependency(self):
+        self.write("omsimulator", 'self.requires("omsimulator-fmi4c/cci.20241114")\n')
+        self.write("omsimulator-fmi4c", "")
+
+        self.assertEqual(
+            self.dependencies("omsimulator", {"omsimulator", "omsimulator-fmi4c"}), {"omsimulator-fmi4c"}
+        )
+        self.assertEqual(self.dependencies("omsimulator-fmi4c", {"omsimulator", "omsimulator-fmi4c"}), set())
+
+    def test_single_quotes_and_missing_recipe(self):
+        self.write("app", "self.requires('lib/1.0')\n")
+
+        self.assertEqual(self.dependencies("app", {"lib"}), {"lib"})
+        self.assertEqual(self.dependencies("removed", {"lib"}), set())
+
+
+class GroupTargetsTests(unittest.TestCase):
+    def test_unrelated_recipes_stay_separate(self):
+        groups = DETECTOR.group_targets([target("b"), target("a")], {})
+
+        self.assertEqual(
+            groups,
+            [{"name": "a", "targets": [target("a")]}, {"name": "b", "targets": [target("b")]}],
+        )
+
+    def test_chain_is_ordered_dependencies_first(self):
+        targets = [target(name) for name in ("omsimulator", "ctpl", "openmodelica", "msl")]
+        dependencies = {"omsimulator": {"ctpl", "openmodelica"}, "openmodelica": {"msl"}}
+
+        groups = DETECTOR.group_targets(targets, dependencies)
+
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(
+            [t["name"] for t in groups[0]["targets"]], ["ctpl", "msl", "openmodelica", "omsimulator"]
+        )
+        self.assertEqual(groups[0]["name"], "ctpl+msl+openmodelica+omsimulator")
+
+    def test_versions_of_a_recipe_stay_together(self):
+        targets = [target("app", "2.0"), target("lib", "1.0"), target("app", "1.0"), target("lib", "2.0")]
+
+        groups = DETECTOR.group_targets(targets, {"app": {"lib"}})
+
+        self.assertEqual(
+            [t["reference"] for t in groups[0]["targets"]], ["lib/1.0", "lib/2.0", "app/2.0", "app/1.0"]
+        )
+
+    def test_dependencies_outside_the_change_are_ignored(self):
+        groups = DETECTOR.group_targets([target("app")], {"app": {"zlib"}})
+
+        self.assertEqual(groups, [{"name": "app", "targets": [target("app")]}])
+
+    def test_cycle_still_forms_one_group(self):
+        groups = DETECTOR.group_targets([target("b"), target("a")], {"a": {"b"}, "b": {"a"}})
+
+        self.assertEqual([g["name"] for g in groups], ["a+b"])
+
+    def test_no_targets(self):
+        self.assertEqual(DETECTOR.group_targets([], {}), [])
 
 
 if __name__ == "__main__":
