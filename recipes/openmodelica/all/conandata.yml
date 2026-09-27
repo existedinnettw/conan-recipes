@@ -1,0 +1,4 @@
+sources:
+  "1.27.1":
+    url: "https://github.com/OpenModelica/OpenModelica/releases/download/v1.27.1/OpenModelica-v1.27.1-src-with-submodules.zip"
+    sha256: "4e41ad73b11e47bab5dac54aa83c6bb4edc4a37188ebd93433dee1c02cc17227"

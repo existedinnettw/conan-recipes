@@ -82,6 +82,8 @@ coverage.xml
 # Translations
 *.mo
 *.pot
+# ...except Modelica sources, which share the extension.
+!recipes/**/*.mo
 
 # Django stuff:
 *.log

@@ -1,0 +1,52 @@
+diff -ruN a/package.mo b/package.mo
+--- a/package.mo
++++ b/package.mo
+@@ -1,7 +1,7 @@
+ within ;
+-package ModelicaServices "ModelicaServices (Default implementation) - Models and functions used in the Modelica Standard Library requiring a tool specific implementation"
++package ModelicaServices "ModelicaServices (OpenModelica implementation) - Models and functions used in the Modelica Standard Library requiring a tool specific implementation"
+   extends Modelica.Icons.Package;
+-  constant String target="Default"
++  constant String target= "OpenModelica"
+     "Target of this ModelicaServices implementation";
+ 
+   package UsersGuide "User's Guide"
+@@ -165,14 +165,15 @@
+       extends
+         Modelica.Utilities.Internal.PartialModelicaServices.ExternalReferences.PartialLoadResource;
+     algorithm
+-      fileReference := Modelica.Utilities.Files.fullPathName(uri);
++      fileReference:=OpenModelica.Scripting.uriToFilename(uri);
+ 
+-      annotation (Documentation(info="<html>
++      annotation (Documentation(info = "<html>
+ <p>
+ The interface of this model is documented at
+ <a href=\"modelica://Modelica.Utilities.Files.loadResource\">Modelica.Utilities.Files.loadResource</a>.
+ </p>
+-</html>"));
++</html>"),
++        __OpenModelica_EarlyInline = true);
+     end loadResource;
+   end ExternalReferences;
+ 
+@@ -181,9 +182,9 @@
+     final constant Real eps=2.2204460492503131e-016 "The difference between 1 and the least value greater than 1 that is representable in the given floating point type";
+     final constant Real small=2.2250738585072014e-308
+       "Minimum normalized positive floating-point number";
+-    final constant Real inf=1.7976931348623157E+308
++    final constant Real inf= 1e60
+       "Maximum representable finite floating-point number";
+-    final constant Integer Integer_inf=2147483647
++    final constant Integer Integer_inf=OpenModelica.Internal.Architecture.integerMax()
+       "Biggest Integer number such that Integer_inf and -Integer_inf are representable on the machine";
+     annotation (Documentation(info="<html>
+ <p>
+@@ -236,7 +237,6 @@
+     versionDate="2025-05-23",
+     dateModified = "2025-05-23 15:00:00Z",
+     revisionId="8ae3d35c2 2025-05-23 14:30:37 +0530",
+-    uses(Modelica(version="4.1.0")),
+     conversion(
+       noneFromVersion="1.0",
+       noneFromVersion="1.1",
