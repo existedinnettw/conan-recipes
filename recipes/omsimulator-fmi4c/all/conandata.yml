@@ -1,0 +1,6 @@
+sources:
+  # OpenModelica's fork of fmi4c, as vendored in OMSimulator-3rdParty at the commit
+  # OMSimulator (OpenModelica v1.27.1) uses. Its last fmi4c change is from 2024-11-14.
+  "cci.20241114":
+    url: "https://github.com/OpenModelica/OMSimulator-3rdParty/archive/d688271c317d4093620076e9d5a1a4030d036446.tar.gz"
+    sha256: "e487b103dd97e7e852c97cd7f2c6c1424efb29634e71bb48953da6e4265147e3"
