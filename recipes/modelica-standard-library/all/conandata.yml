@@ -1,0 +1,20 @@
+sources:
+  "4.1.0":
+    url: "https://github.com/modelica/ModelicaStandardLibrary/releases/download/v4.1.0/ModelicaStandardLibrary_v4.1.0.zip"
+    sha256: "5409cfa17797c52d866dc9d2675badc1378b4bbf88066e60899a489cb1cb8a2d"
+patches:
+  # The changes OpenModelica makes to its own MSL distribution
+  # (https://github.com/OpenModelica/OpenModelica-ModelicaStandardLibrary, patch.mos),
+  # applied with modelica_services=openmodelica.
+  "4.1.0":
+    - patch_file: "patches/4.1.0-0001-openmodelica-modelicaservices.patch"
+      patch_description: "OpenModelica implementation of ModelicaServices"
+      patch_type: "portability"
+      base_path: "ModelicaServices 4.1.0"
+    - patch_file: "patches/4.1.0-0002-openmodelica-modelica.patch"
+      patch_description: "Drop C header includes OpenModelica provides itself, and set solver flags for two examples"
+      patch_type: "portability"
+      base_path: "Modelica 4.1.0"
+    - patch_file: "patches/4.1.0-0003-openmodelica-obsoletemodelica4.patch"
+      patch_description: "Drop C header includes OpenModelica provides itself"
+      patch_type: "portability"
