@@ -1,0 +1,9 @@
+sources:
+  "6.30.0":
+    url: "https://download.kde.org/stable/frameworks/6.30/extra-cmake-modules-6.30.0.tar.xz"
+    sha256: "22c9f7ff930dae7329faebf2942d2424f4a298c43bb3f11e217be6b12f227f6e"
+patches:
+  "6.30.0":
+    - patch_file: "patches/0001-fix-find_package-qt.patch"
+      patch_description: "find Qt modules as components of the Qt6 package Conan generates"
+      patch_type: "conan"
