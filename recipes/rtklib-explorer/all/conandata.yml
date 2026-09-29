@@ -1,0 +1,4 @@
+sources:
+  "2.5.1":
+    url: "https://github.com/rtklibexplorer/RTKLIB/archive/refs/tags/v2.5.1.tar.gz"
+    sha256: "ad8e56f64dd2b71e2eb8098c27925a65b027b161eae366cf5afb71402348d2e1"
