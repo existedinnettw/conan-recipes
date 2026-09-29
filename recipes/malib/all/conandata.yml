@@ -1,0 +1,4 @@
+sources:
+  "1.2.0-pre":
+    url: "https://github.com/JAXA-SNU/MALIB/archive/refs/tags/v1.2.0_pre.tar.gz"
+    sha256: "341f01c5b022dcca67c6f192cb91991278e1b194c743afa9388163afff4678bf"
