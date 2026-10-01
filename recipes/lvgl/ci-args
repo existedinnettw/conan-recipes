@@ -1,0 +1,10 @@
+# One argument per line, appended to `conan create` by the CI/CD workflows.
+# Also build the Linux backends that need no system packages. SDL2 and Wayland
+# come from Conan Center's sdl/xkbcommon, which need X11 -dev packages via
+# xorg/system that the runners do not have.
+-o
+lvgl/*:with_linux_fbdev=True
+-o
+lvgl/*:with_linux_drm=True
+-o
+lvgl/*:with_evdev=True
