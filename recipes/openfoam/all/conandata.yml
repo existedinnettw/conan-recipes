@@ -1,0 +1,6 @@
+sources:
+  "2606":
+    url:
+      - "https://dl.openfoam.com/source/v2606/OpenFOAM-v2606.tgz"
+      - "https://sourceforge.net/projects/openfoam/files/v2606/OpenFOAM-v2606.tgz"
+    sha256: "2a1310e3ed192cc4c521e1d22dcc176f57bec61160c878dc4348f21d6672294d"

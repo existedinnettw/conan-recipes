@@ -1,0 +1,4 @@
+sources:
+  "14":
+    url: "https://github.com/OpenFOAM/OpenFOAM-14/archive/refs/tags/version-14.tar.gz"
+    sha256: "f9eaa89b1f1986ff8b7ce04cf5aaf11ceeeb05bd0c4e4fc3d4bfd199d56f82e9"
