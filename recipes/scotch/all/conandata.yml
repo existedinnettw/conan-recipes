@@ -1,0 +1,4 @@
+sources:
+  "7.0.16":
+    url: "https://gitlab.inria.fr/scotch/scotch/-/archive/v7.0.16/scotch-v7.0.16.tar.gz"
+    sha256: "76557a986c2bbcc08a122e21113f77266e08b584bc2d2d3a0dede39572d1af78"
