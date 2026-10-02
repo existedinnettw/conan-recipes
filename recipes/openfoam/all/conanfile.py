@@ -474,6 +474,15 @@ class OpenFOAMConan(ConanFile):
             env_info.prepend_path("PATH", [resolve(p) for p in captured["PATH"]])
             env_info.prepend_path("LD_LIBRARY_PATH", [resolve(p) for p in captured["LD_LIBRARY_PATH"]])
             env_info.compose_env(dep_env)
+        # Linking an executable makes ld resolve the DT_NEEDED entries of the libraries
+        # it links (libPstream needs libmpi) through LD_LIBRARY_PATH. Conan puts the
+        # shared dependencies' lib dirs only into the run environment; wmake builds
+        # against this package need them in the build environment too.
+        shared_libdirs = []
+        for dep in self.dependencies.host.values():
+            if dep.package_folder and dep.options.get_safe("shared"):
+                shared_libdirs += dep.cpp_info.aggregated_components().libdirs
+        self.buildenv_info.append_path("LD_LIBRARY_PATH", shared_libdirs)
 
         # For CMake and other build systems: the core libraries, header dirs and defines
         # a wmake build would use. Further OpenFOAM libraries can be added to a target by
