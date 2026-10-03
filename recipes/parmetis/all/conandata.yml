@@ -1,0 +1,6 @@
+sources:
+  # KarypisLab/ParMETIS has no release since 4.0.3 (2013); its main branch is that
+  # release ported to the split METIS 5.2 / GKlib libraries Conan Center packages.
+  "4.0.3.20230326":
+    url: "https://github.com/KarypisLab/ParMETIS/archive/8ee6a372ca703836f593e3c450ca903f04be14df.tar.gz"
+    sha256: "7107e508899f35c6c298fe40b05a5648b0621e8cbf8d4376c3819d375b6ee5f4"
