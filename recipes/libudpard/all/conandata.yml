@@ -1,0 +1,4 @@
+sources:
+  "2.0.0":
+    url: "https://github.com/OpenCyphal/libudpard/archive/refs/tags/2.0.0.tar.gz"
+    sha256: "8e9ecaaf8724963b9d31cb87ed0c8d877b098acba2b16d89a0bedb35b81f8a4a"
