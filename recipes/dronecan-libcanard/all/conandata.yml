@@ -1,0 +1,4 @@
+sources:
+  "cci.20250713":
+    url: "https://github.com/dronecan/libcanard/archive/601ed35467e0ac38819df17cd7c918de19f62d58.tar.gz"
+    sha256: "d485a635e257182a5d34ecc1858a823c9b391a78a22760d80abb973fc60ff304"
