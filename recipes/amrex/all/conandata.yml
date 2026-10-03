@@ -1,0 +1,4 @@
+sources:
+  "26.10":
+    url: "https://github.com/AMReX-Codes/amrex/releases/download/26.10/amrex-26.10.tar.gz"
+    sha256: "204e9c7c11d21f55e766e5f8a9999d7cfcfc770ba78a84aa3bd26a1da11dfa43"
