@@ -1,0 +1,26 @@
+sources:
+  "3.0.1b1":
+    nunavut:
+      url: "https://github.com/OpenCyphal/nunavut/archive/refs/tags/3.0.1b1.tar.gz"
+      sha256: "18cbd73cc7af029b78853dfcb9885f50ad0d5629502b1fbba3e29dd0c7d5c893"
+    # The submodules that NunavutConfig.cmake runs from: pydsdl 1.24.3 and the
+    # public regulated DSDL namespaces (uavcan, reg).
+    pydsdl:
+      url: "https://github.com/OpenCyphal/pydsdl/archive/2229ca522f2aa9c6de17999d9ee3c4a6ef14ca06.tar.gz"
+      sha256: "7cf258169acffab8d681932605103080407853ca5d4f4659e5b33664fb0d92b2"
+    public_regulated_data_types:
+      url: "https://github.com/OpenCyphal/public_regulated_data_types/archive/f9f67906cc0ca5d7c1b429924852f6b28f313cbf.tar.gz"
+      sha256: "3c49db58679afc29d45625919a4eaaa056fd768ce447c9e61fa92ede565ffbcb"
+patches:
+  "3.0.1b1":
+    - patch_file: "patches/0001-python-3.14-pickle-read-files-args.patch"
+      patch_description: >-
+        Pass the pydsdl.read_files() arguments to Pool.apply_async() as a tuple
+        instead of an itertools.chain, which Python 3.14 can no longer pickle.
+      patch_type: "portability"
+    - patch_file: "patches/0002-generate-without-posix-shell.patch"
+      patch_description: >-
+        Have add_cyphal_library()'s generate step set PYTHONPATH with
+        "cmake -E env" instead of "export PYTHONPATH=... &&", which needs a
+        POSIX shell.
+      patch_type: "portability"
