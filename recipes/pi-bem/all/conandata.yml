@@ -1,0 +1,15 @@
+sources:
+  # master after v9.5.0 (VERSION says 9.6.0, untagged): ported to deal.II 9.6.
+  "9.5.0.20241120":
+    url: "https://github.com/mathLab/pi-BEM/archive/f4332c01adb356ee59554456c117cdc766314749.tar.gz"
+    sha256: "49a25e70e1b405c331dad81b5855d9641acb45b2be2dfd792cce6ae4a46be94e"
+patches:
+  "9.5.0.20241120":
+    - patch_file: "patches/0001-port-to-deal.II-9.8-and-cxx20.patch"
+      patch_description: >-
+        Port to deal.II 9.7+ (TrilinosWrappers::MPI::Vector::reinit() lost its
+        allow_different_maps argument; assignment imports between layouts) and
+        C++20 (numbers:: is ambiguous with std::numbers under using namespace
+        std), and call project() before find_package(deal.II) so a toolchain
+        file applies.
+      patch_type: "portability"

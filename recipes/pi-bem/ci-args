@@ -1,0 +1,11 @@
+# One argument per line, appended to `conan create` by the CI/CD workflows.
+# deal.II's OpenCASCADE (Conan Center) requires xorg/system on Linux, which needs the
+# X11 development packages the runner does not have.
+-c
+tools.system.package_manager:mode=install
+-c
+tools.system.package_manager:sudo=True
+# OpenCASCADE 7.9.1's QA harness (TKQADraw), which the Conan Center recipe always
+# builds, does not compile as C++20 or later.
+-s
+opencascade/*:compiler.cppstd=17
