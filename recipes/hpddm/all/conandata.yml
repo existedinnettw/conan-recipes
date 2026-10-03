@@ -1,0 +1,4 @@
+sources:
+  "2.4.1":
+    url: "https://github.com/hpddm/hpddm/archive/refs/tags/v2.4.1.tar.gz"
+    sha256: "2496e573f183e6044613331eeb040722e8cae1a710f72b107cb58325a7c6449c"
