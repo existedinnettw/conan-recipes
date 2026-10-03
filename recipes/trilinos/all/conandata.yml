@@ -1,0 +1,4 @@
+sources:
+  "16.2.2":
+    url: "https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-16-2-2.tar.gz"
+    sha256: "211810d0f642736ac93ca500c3e28c72a9e8fa9991a757d60c0ecc85108e35d4"

@@ -1,0 +1,137 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 70a6150..91a5d07 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,6 +37,10 @@ ENDIF()
+ 
+ CMAKE_MINIMUM_REQUIRED(VERSION 3.13.4)
+ 
++# Before find_package(): a toolchain file (with the dependencies' locations) is
++# only loaded by project().
++PROJECT(${TARGET})
++
+ FIND_PACKAGE(deal.II 9.5.0 REQUIRED
+   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
+ )
+@@ -54,7 +58,6 @@ ENDIF()
+ DEAL_II_INITIALIZE_CACHED_VARIABLES()
+ 
+ 
+-PROJECT(${TARGET})
+ 
+ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+ set(CMAKE_MACOSX_RPATH 1)
+diff --git a/include/constrained_matrix.h b/include/constrained_matrix.h
+index 6bf2c06..ae09d77 100644
+--- a/include/constrained_matrix.h
++++ b/include/constrained_matrix.h
+@@ -94,7 +94,7 @@ ConstrainedOperator<VEC, MATRIX>::vmult(VEC &dst, const VEC &src) const
+ {
+   // Vector<double> loc_src(src);
+   VEC loc_src(constr_cpu_set);
+-  loc_src.reinit(src, false, true);
++  loc_src = src;
+   // loc_src = src;
+ 
+   // std::cout<<"in vector "<<std::endl;
+diff --git a/include/true_constrained_matrix.h b/include/true_constrained_matrix.h
+index cf26847..258457a 100644
+--- a/include/true_constrained_matrix.h
++++ b/include/true_constrained_matrix.h
+@@ -116,7 +116,7 @@ ConstrainedOperator<VEC, MATRIX>::constraint_vmult(VEC       &dst,
+                                                    const VEC &src) const
+ {
+   VEC loc_src(src.locally_owned_elements(), constr_cpu_set, mpi_communicator);
+-  loc_src.reinit(src, false, true);
++  loc_src = src;
+ 
+   for (unsigned int i = 0; i < dst.size(); ++i)
+     {
+diff --git a/source/bem_problem.cc b/source/bem_problem.cc
+index 5c38cc1..0ed1e31 100644
+--- a/source/bem_problem.cc
++++ b/source/bem_problem.cc
+@@ -862,7 +862,7 @@ BEMProblem<dim>::assemble_system()
+               local_dirichlet_matrix_row_i = 0;
+ 
+               bool         is_singular    = false;
+-              unsigned int singular_index = numbers::invalid_unsigned_int;
++              unsigned int singular_index = dealii::numbers::invalid_unsigned_int;
+ 
+               for (unsigned int j = 0; j < fe->dofs_per_cell; ++j)
+                 // if(local_dof_indices[j] == i)
+@@ -1114,7 +1114,7 @@ BEMProblem<dim>::assemble_system()
+                   // pointer. To be sure we can
+                   // then add a safety check at
+                   // the end:
+-                  Assert(singular_index != numbers::invalid_unsigned_int,
++                  Assert(singular_index != dealii::numbers::invalid_unsigned_int,
+                          ExcInternalError());
+ 
+                   const Quadrature<dim - 1> *singular_quadrature =
+@@ -1422,7 +1422,7 @@ BEMProblem<dim>::compute_hypersingular_free_coeffs()
+             }
+           double geom_alpha = 0.5;
+ 
+-          geom_alpha = 2 * numbers::PI;
++          geom_alpha = 2 * dealii::numbers::PI;
+           if (unique_ordered_normals.size() > 1)
+             {
+               for (unsigned int k = 1; k < unique_ordered_normals.size(); ++k)
+@@ -1432,7 +1432,7 @@ BEMProblem<dim>::compute_hypersingular_free_coeffs()
+                 acos(unique_ordered_normals[unique_ordered_normals.size() - 1] *
+                      unique_ordered_normals[0]);
+             }
+-          geom_alpha /= 4 * numbers::PI;
++          geom_alpha /= 4 * dealii::numbers::PI;
+           hyp_alpha(i) = geom_alpha;
+ 
+           // just in case we need to check the code
+@@ -1450,7 +1450,7 @@ BEMProblem<dim>::compute_hypersingular_free_coeffs()
+                 if (dim == 3)
+                   {
+                     C_matrix -=
+-                      1. / 4. / numbers::PI *
++                      1. / 4. / dealii::numbers::PI *
+                       outer_product(cross_product_3d(unique_tangents[k + 1] -
+                                                        unique_tangents[k],
+                                                      unique_ordered_normals[k]),
+@@ -1461,7 +1461,7 @@ BEMProblem<dim>::compute_hypersingular_free_coeffs()
+                     // cout<<"unique_ordered_normals[k]"<<unique_ordered_normals[k]<<endl;
+                   }
+                 else if (dim == 2)
+-                  C_matrix -= 1 / 2 / numbers::PI *
++                  C_matrix -= 1 / 2 / dealii::numbers::PI *
+                               outer_product(unique_tangents[k],
+                                             unique_ordered_normals[k]);
+             }
+@@ -2269,9 +2269,9 @@ BEMProblem<dim>::compute_gradients(
+   // We let Trilinos take care of it.
+ 
+   TrilinosWrappers::MPI::Vector phi(ghosted_set);
+-  phi.reinit(glob_phi, false, true);
++  phi = glob_phi;
+   TrilinosWrappers::MPI::Vector dphi_dn(ghosted_set);
+-  dphi_dn.reinit(glob_dphi_dn, false, true);
++  dphi_dn = glob_dphi_dn;
+ 
+ 
+ 
+@@ -2428,7 +2428,7 @@ BEMProblem<dim>::compute_surface_gradients(
+ {
+   Teuchos::TimeMonitor          LocalTimer(*SurfaceGradientTime);
+   TrilinosWrappers::MPI::Vector phi(ghosted_set);
+-  phi.reinit(tmp_rhs, false, true);
++  phi = tmp_rhs;
+ 
+   vector_surface_gradients_solution.reinit(vector_this_cpu_set,
+                                            mpi_communicator);
+@@ -2680,7 +2680,7 @@ BEMProblem<dim>::compute_gradients_hypersingular(
+           if (this_cpu_set.is_element(i))
+             {
+               bool         is_singular    = false;
+-              unsigned int singular_index = numbers::invalid_unsigned_int;
++              unsigned int singular_index = dealii::numbers::invalid_unsigned_int;
+ 
+               for (unsigned int j = 0; j < fe->dofs_per_cell; ++j)
+                 // if(local_dof_indices[j] == i)
