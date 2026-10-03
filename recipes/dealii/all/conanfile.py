@@ -31,6 +31,9 @@ class DealiiConan(ConanFile):
         "with_mpi": [True, False],
         "with_p4est": [True, False],
         "with_petsc": [True, False],
+        "with_trilinos": [True, False],
+        "with_opencascade": [True, False],
+        "with_tbb": [True, False],
         "with_metis": [True, False],
         "with_lapack": [True, False],
         "with_zlib": [True, False],
@@ -45,11 +48,23 @@ class DealiiConan(ConanFile):
         "with_mpi": True,
         "with_p4est": True,
         "with_petsc": True,
+        "with_trilinos": False,
+        "with_opencascade": False,
+        "with_tbb": False,
         "with_metis": True,
         "with_lapack": True,
         "with_zlib": True,
         "with_complex_values": False,
         "int64": False,
+        # deal.II links only the OpenCASCADE toolkits it uses; the static ones would
+        # also need the toolkits they depend on. Its visualization (Tk, OpenGL) is not
+        # used.
+        "opencascade/*:shared": True,
+        "opencascade/*:with_tk": False,
+        "opencascade/*:with_opengl": False,
+        # oneTBB's NUMA binding library (unused by deal.II) needs a shared hwloc, which
+        # is static by default and also used, statically, by openmpi.
+        "onetbb/*:tbbbind": False,
     }
 
     def config_options(self):
@@ -60,9 +75,10 @@ class DealiiConan(ConanFile):
         if self.options.shared:
             self.options.rm_safe("fPIC")
         if not self.options.with_mpi:
-            # Both need MPI in deal.II.
+            # These need MPI in deal.II.
             self.options.rm_safe("with_p4est")
             self.options.rm_safe("with_petsc")
+            self.options.rm_safe("with_trilinos")
         else:
             # Open MPI's static archives define the MPI_* entry points as weak symbols,
             # so a shared library linking libmpi.a does not pull them in and is left
@@ -76,6 +92,8 @@ class DealiiConan(ConanFile):
             self.options["petsc"].int64 = bool(self.options.int64)
             if self.options.with_complex_values:
                 self.options["petsc"].scalar_type = "complex"
+        if self.options.get_safe("with_trilinos"):
+            self.options["trilinos"].with_mpi = True
 
     def layout(self):
         cmake_layout(self, src_folder="src")
@@ -90,6 +108,16 @@ class DealiiConan(ConanFile):
         if self.options.get_safe("with_petsc"):
             # deal.II/lac/petsc_*.h include the PETSc headers.
             self.requires("petsc/[>=3.26 <4]", transitive_headers=True, transitive_libs=True)
+        if self.options.get_safe("with_trilinos"):
+            # deal.II/lac/trilinos_*.h include the Teuchos and Epetra headers. Trilinos
+            # 17 removed Epetra, which deal.II's TrilinosWrappers are built on.
+            self.requires("trilinos/[>=16.2 <17]", transitive_headers=True, transitive_libs=True)
+        if self.options.with_opencascade:
+            # deal.II/opencascade/*.h include the OpenCASCADE headers.
+            self.requires("opencascade/[>=7.8 <8]", transitive_headers=True, transitive_libs=True)
+        if self.options.with_tbb:
+            # deal.II/base/parallel.h and work_stream.h include the TBB headers.
+            self.requires("onetbb/[>=2021.6 <2024]", transitive_headers=True, transitive_libs=True)
         if self.options.with_metis:
             self.requires("metis/[>=5.2.1 <6]")
         if self.options.with_lapack:
@@ -176,6 +204,9 @@ class DealiiConan(ConanFile):
             "MPI": self.options.with_mpi,
             "P4EST": self.options.get_safe("with_p4est"),
             "PETSC": self.options.get_safe("with_petsc"),
+            "TRILINOS": self.options.get_safe("with_trilinos"),
+            "OPENCASCADE": self.options.with_opencascade,
+            "TBB": self.options.with_tbb,
             "METIS": self.options.with_metis,
             "LAPACK": self.options.with_lapack,
             "ZLIB": self.options.with_zlib,
@@ -183,9 +214,8 @@ class DealiiConan(ConanFile):
         for feature, enabled in features.items():
             tc.cache_variables[f"DEAL_II_WITH_{feature}"] = bool(enabled)
         for feature in ("ADOLC", "ARBORX", "ARPACK", "ASSIMP", "CGAL", "GINKGO", "GMSH",
-                        "GSL", "HDF5", "MUMPS", "NETCDF", "OPENCASCADE", "PSBLAS",
-                        "SCALAPACK", "SLEPC", "SUNDIALS", "SYMENGINE", "TBB", "TRILINOS",
-                        "VTK"):
+                        "GSL", "HDF5", "MUMPS", "NETCDF", "PSBLAS", "SCALAPACK", "SLEPC",
+                        "SUNDIALS", "SYMENGINE", "VTK"):
             tc.cache_variables[f"DEAL_II_WITH_{feature}"] = False
         # deal.II's own copies, compiled into libdeal_II, rather than whatever the build
         # machine has installed.
@@ -205,6 +235,13 @@ class DealiiConan(ConanFile):
         if self.options.get_safe("with_petsc"):
             tc.cache_variables["PETSC_DIR"] = self.dependencies["petsc"].package_folder.replace("\\", "/")
             tc.cache_variables["PETSC_ARCH"] = ""
+        if self.options.get_safe("with_trilinos"):
+            tc.cache_variables["TRILINOS_DIR"] = self._write_trilinos_config()
+        if self.options.with_tbb:
+            tc.cache_variables["TBB_DIR"] = self.dependencies["onetbb"].package_folder.replace("\\", "/")
+        if self.options.with_opencascade:
+            tc.cache_variables["OPENCASCADE_DIR"] = \
+                self.dependencies["opencascade"].package_folder.replace("\\", "/")
         if self.options.with_metis:
             metis = self.dependencies["metis"]
             # deal.II links only libmetis; a static one also needs GKlib.
@@ -229,6 +266,40 @@ class DealiiConan(ConanFile):
             tc.cache_variables["LAPACK_LIBRARIES"] = libs
         tc.generate()
 
+    def _write_trilinos_config(self):
+        # deal.II reads Trilinos through upstream's TrilinosConfig.cmake, which the
+        # trilinos package does not ship (it hard-codes the build machine's paths). This
+        # stand-in provides what deal.II uses from it: the version, package and TPL
+        # lists, the include directories and a Trilinos::all_libs target. MPI and
+        # BLAS/LAPACK are linked by deal.II itself.
+        trilinos = self.dependencies["trilinos"]
+        info = trilinos.cpp_info.aggregated_components()
+        includes = ";".join(d.replace("\\", "/") for d in info.includedirs)
+        libs = ";".join(self._library_files(trilinos, info.libs))
+        packages = ";".join(reversed([c.get_property("cmake_target_name").split("::")[0]
+                                      for _, c in trilinos.cpp_info.get_sorted_components().items()]))
+        folder = os.path.join(self.generators_folder, "trilinos")
+        save(self, os.path.join(folder, "TrilinosConfig.cmake"), textwrap.dedent(f"""\
+            set(Trilinos_FOUND TRUE)
+            set(Trilinos_VERSION "{trilinos.ref.version}")
+            set(Trilinos_PACKAGE_LIST "{packages}")
+            set(Trilinos_TPL_LIST "LAPACK;BLAS;MPI")
+            set(Trilinos_INCLUDE_DIRS "{includes}")
+            set(Trilinos_LIBRARIES "{libs}")
+            if(NOT TARGET Trilinos::all_libs)
+              add_library(Trilinos::all_libs INTERFACE IMPORTED)
+              set_target_properties(Trilinos::all_libs PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${{Trilinos_INCLUDE_DIRS}}"
+                INTERFACE_LINK_LIBRARIES "${{Trilinos_LIBRARIES}}")
+            endif()
+            """))
+        save(self, os.path.join(folder, "TrilinosConfigVersion.cmake"), textwrap.dedent(f"""\
+            set(PACKAGE_VERSION "{trilinos.ref.version}")
+            set(PACKAGE_VERSION_COMPATIBLE TRUE)
+            set(PACKAGE_VERSION_EXACT FALSE)
+            """))
+        return folder.replace("\\", "/")
+
     def build(self):
         cmake = CMake(self)
         cmake.configure()
@@ -236,12 +307,15 @@ class DealiiConan(ConanFile):
 
     def _write_cmake_module(self):
         # Most deal.II applications (all its tutorials) call these two macros from
-        # upstream's deal.IIConfig.cmake. That file hard-codes the build machine's
-        # dependency paths, so it is replaced by the CMakeDeps one plus these
-        # equivalents.
-        content = textwrap.dedent("""\
-            set(DEAL_II_PACKAGE_VERSION "${deal.II_VERSION}")
-            set(DEAL_II_VERSION "${deal.II_VERSION}")
+        # upstream's deal.IIConfig.cmake, and some pick their targets' build type by
+        # DEAL_II_BUILD_TYPE. That file hard-codes the build machine's dependency
+        # paths, so it is replaced by the CMakeDeps one plus these equivalents.
+        build_type = "Debug" if self.settings.build_type == "Debug" else "Release"
+        content = textwrap.dedent(f"""\
+            set(DEAL_II_PACKAGE_VERSION "${{deal.II_VERSION}}")
+            set(DEAL_II_VERSION "${{deal.II_VERSION}}")
+            set(DEAL_II_BUILD_TYPE "{build_type}")
+            set(DEAL_II_BUILD_TYPES "{build_type.upper()}")
             if(NOT COMMAND deal_ii_initialize_cached_variables)
               macro(deal_ii_initialize_cached_variables)
                 if(NOT CMAKE_BUILD_TYPE)
@@ -251,7 +325,7 @@ class DealiiConan(ConanFile):
             endif()
             if(NOT COMMAND deal_ii_setup_target)
               macro(deal_ii_setup_target _target)
-                target_link_libraries(${_target} dealii::dealii)
+                target_link_libraries(${{_target}} dealii::dealii)
               endmacro()
             endif()
             """)
@@ -296,6 +370,11 @@ class DealiiConan(ConanFile):
         for option, ref in (
             ("with_p4est", "p4est::p4est"),
             ("with_petsc", "petsc::petsc"),
+            ("with_trilinos", "trilinos::trilinos"),
+            ("with_opencascade", "opencascade::opencascade"),
+            # Not the whole package: tbbmalloc_proxy replaces malloc in every program
+            # that links it.
+            ("with_tbb", "onetbb::libtbb"),
             ("with_metis", "metis::metis"),
             ("with_lapack", "openblas::openblas_component"),
             ("with_zlib", "zlib::zlib"),

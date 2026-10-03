@@ -17,9 +17,21 @@
 #ifdef DEAL_II_WITH_LAPACK
 #  include <deal.II/lac/lapack_full_matrix.h>
 #endif
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_precondition.h>
+#  include <deal.II/lac/trilinos_solver.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#endif
+#ifdef DEAL_II_WITH_OPENCASCADE
+#  include <deal.II/opencascade/utilities.h>
+
+#  include <BRepPrimAPI_MakeBox.hxx>
+#endif
 
 #include <cmath>
 #include <iostream>
+#include <tuple>
 
 #ifdef DEAL_II_WITH_MPI
 constexpr bool have_mpi = true;
@@ -35,6 +47,21 @@ constexpr bool have_p4est = false;
 constexpr bool have_petsc = true;
 #else
 constexpr bool have_petsc = false;
+#endif
+#ifdef DEAL_II_WITH_TRILINOS
+constexpr bool have_trilinos = true;
+#else
+constexpr bool have_trilinos = false;
+#endif
+#ifdef DEAL_II_WITH_OPENCASCADE
+constexpr bool have_opencascade = true;
+#else
+constexpr bool have_opencascade = false;
+#endif
+#ifdef DEAL_II_WITH_TBB
+constexpr bool have_tbb = true;
+#else
+constexpr bool have_tbb = false;
 #endif
 #ifdef DEAL_II_WITH_METIS
 constexpr bool have_metis = true;
@@ -65,6 +92,9 @@ constexpr bool have_64bit = false;
 static_assert(have_mpi == EXPECT_MPI, "DEAL_II_WITH_MPI does not match option with_mpi");
 static_assert(have_p4est == EXPECT_P4EST, "DEAL_II_WITH_P4EST does not match option with_p4est");
 static_assert(have_petsc == EXPECT_PETSC, "DEAL_II_WITH_PETSC does not match option with_petsc");
+static_assert(have_trilinos == EXPECT_TRILINOS, "DEAL_II_WITH_TRILINOS does not match option with_trilinos");
+static_assert(have_opencascade == EXPECT_OPENCASCADE, "DEAL_II_WITH_OPENCASCADE does not match option with_opencascade");
+static_assert(have_tbb == EXPECT_TBB, "DEAL_II_WITH_TBB does not match option with_tbb");
 static_assert(have_metis == EXPECT_METIS, "DEAL_II_WITH_METIS does not match option with_metis");
 static_assert(have_lapack == EXPECT_LAPACK, "DEAL_II_WITH_LAPACK does not match option with_lapack");
 static_assert(have_zlib == EXPECT_ZLIB, "DEAL_II_WITH_ZLIB does not match option with_zlib");
@@ -110,6 +140,58 @@ int main(int argc, char *argv[])
     if (root)
       std::cout << "PETSc vector l1 norm: " << norm << "\n";
     AssertThrow(std::abs(norm - n_dofs) < 1e-12, ExcInternalError());
+  }
+#endif
+
+#ifdef DEAL_II_WITH_TRILINOS
+  {
+    // A 1D Laplacian (tridiagonal) solved with Trilinos CG (AztecOO) and an ILU
+    // preconditioner (Ifpack), as an Epetra matrix distributed over the ranks.
+    const unsigned int n = 100;
+    const IndexSet     owned = Utilities::MPI::create_evenly_distributed_partitioning(comm, n);
+    TrilinosWrappers::SparseMatrix A(owned, comm, 3);
+    for (const auto row : owned)
+      {
+        if (row > 0)
+          A.set(row, row - 1, -1.0);
+        A.set(row, row, 2.0);
+        if (row + 1 < n)
+          A.set(row, row + 1, -1.0);
+      }
+    A.compress(VectorOperation::insert);
+
+    TrilinosWrappers::MPI::Vector x(owned, comm), b(owned, comm);
+    b = 1.0;
+    SolverControl                   control(1000, 1e-10);
+    TrilinosWrappers::SolverCG      solver(control);
+    TrilinosWrappers::PreconditionILU ilu;
+    ilu.initialize(A);
+    solver.solve(A, x, b, ilu);
+
+    // The exact solution of the discrete system: x_i = (i + 1) (n - i) / 2.
+    double error = 0;
+    for (const auto i : owned)
+      error = std::max(error, std::abs(x(i) - 0.5 * (i + 1.0) * (n - i)));
+    error = Utilities::MPI::max(error, comm);
+    if (root)
+      std::cout << "Trilinos CG + ILU: " << control.last_step() << " iterations, max error "
+                << error << std::endl;
+    AssertThrow(error < 1e-6, ExcInternalError());
+  }
+#endif
+
+#ifdef DEAL_II_WITH_OPENCASCADE
+  {
+    // A box built by OpenCASCADE has 6 faces (edges and vertices are counted once
+    // per face that uses them), and a point just above its top face projects onto
+    // that face.
+    const TopoDS_Shape box = BRepPrimAPI_MakeBox(1.0, 2.0, 3.0).Shape();
+    const auto faces = std::get<0>(OpenCASCADE::count_elements(box));
+    const Point<3> projection = OpenCASCADE::closest_point(box, Point<3>(0.5, 1.0, 3.1));
+    if (root)
+      std::cout << "OpenCASCADE box: " << faces << " faces, projection " << projection << std::endl;
+    AssertThrow(faces == 6, ExcInternalError());
+    AssertThrow(projection.distance(Point<3>(0.5, 1.0, 3.0)) < 1e-6, ExcInternalError());
   }
 #endif
 
