@@ -1,0 +1,6 @@
+sources:
+  "3.26.0":
+    url:
+      - "https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-3.26.0.tar.gz"
+      - "https://gitlab.com/petsc/petsc/-/archive/v3.26.0/petsc-v3.26.0.tar.gz"
+    sha256: "f5230023e6e22ee607802a13c82bc25f3d81e71654ad386a5b9bdff17fed93df"
