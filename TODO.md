@@ -129,3 +129,30 @@ The real need is sharing UI code between a PC build and the Zephyr target:
   names (`LV_*` here, `CONFIG_LV_*` in Kconfig). Zephyr apps write
   `#include <lvgl.h>`, while this recipe gives `<lvgl/lvgl.h>`. Adding
   `include/lvgl` to the recipe's include dirs would make both spellings work.
+
+## HierBEM (deferred)
+
+[HierBEM](https://github.com/jihuan-tian/hierbem) (H-matrix Galerkin BEM, v1.0.0,
+LGPL-3.0) was asked for together with `hpddm`, `bemuse`, `nemoh` and `pi-bem`, but
+cannot be packaged with what this repo and its CI have:
+
+- **CUDA is mandatory.** The project declares `LANGUAGES CUDA CXX`, and
+  `libhierbem` itself has `.cu` sources (ACA+, Sauter quadrature, the Laplace BEM).
+  Neither this machine nor the CI runners have a CUDA toolkit; without a GPU, a
+  test package could only link, not run kernels.
+- **A forked deal.II.** It needs the author's
+  [deal.II 9.4.1-cuda12 fork](https://github.com/jihuan-tian/dealii), built with
+  `DEAL_II_WITH_CUDA` (upstream dropped that in 9.5 for Kokkos) plus MPI, complex
+  values, LAPACK, muParser, HDF5, TBB, OpenCASCADE and Gmsh. The `dealii` recipe
+  here is 9.8.0 with none of the last six.
+- **A forked Gmsh.** The [author's Gmsh 4.14 fork](https://github.com/jihuan-tian/gmsh)
+  (branch `1-expose-internal-functions-of-the-class-occ_internals`), built with
+  OpenCASCADE. Conan Center has no Gmsh at all.
+- Also reflect-cpp, fmt, cpptrace and toml++ (all on Conan Center), and no
+  `install()` rules: upstream only builds `libhierbem.so` and its tests in the
+  build tree.
+
+Needed before starting: a CUDA toolkit on CI (several GB of apt packages, or a
+CUDA container) and on the dev host, then recipes for the two forks (deal.II as
+its own recipe or a `9.4.1-cuda12` version of `dealii`), then `hierbem` with its
+own install rules.
