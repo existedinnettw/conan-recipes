@@ -1,0 +1,13 @@
+diff --git a/src/nunavut/_namespace.py b/src/nunavut/_namespace.py
+index 76d7373..7344086 100644
+--- a/src/nunavut/_namespace.py
++++ b/src/nunavut/_namespace.py
+@@ -145,7 +145,7 @@ def _read_files_strategy(
+     already_read: set[Path] = set()
+     while fileset:
+         next_file = fileset.pop()
+-        running_lookups.append(apply_method(pydsdl.read_files, args=itertools.chain([next_file], args)))
++        running_lookups.append(apply_method(pydsdl.read_files, args=(next_file, *args)))
+         already_read.add(_resolve_file(next_file))
+         if not fileset:
+             for lookup in running_lookups:

@@ -1,0 +1,4 @@
+# A project-local type that depends on a public regulated one.
+uavcan.node.Heartbeat.1.0 heartbeat
+uint8 battery_percent
+@sealed
