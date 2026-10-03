@@ -1,0 +1,19 @@
+sources:
+  "8.5.0":
+    su2:
+      url: "https://github.com/su2code/SU2/archive/refs/tags/v8.5.0.tar.gz"
+      sha256: "c6463b667ed81ec8fef1efa015f1368d8ceb29078cfea899a3fad5c7c232f3a9"
+    # Git submodules, which the GitHub tarball leaves empty. The commits are the ones
+    # pinned in meson_scripts/init.py of the release.
+    mel:
+      url: "https://github.com/pcarruscag/MEL/archive/46205ab019e5224559091375a6d71aabae6bc5b9.tar.gz"
+      sha256: "e0f7f95ab80d098a2c2bafceefb52e958378302c2150ef7cb9fe2bf4aa81177b"
+    fado:
+      url: "https://github.com/pcarruscag/FADO/archive/ce7ee018e4e699af5028d69baa1939fea290e18a.tar.gz"
+      sha256: "27dad56c79612681a7d7d09ef7afb2501133d8acfe3e2ebaeff7f6b4dc0830f5"
+    codi:
+      url: "https://github.com/scicompkl/CoDiPack/archive/a0725b2bfd172e741a07f96b041a5ddf88d441d7.tar.gz"
+      sha256: "0a8b4c251ab268fe60c29f54ff17bb52cbe9421c6b43c0a008a55f1ce66886c9"
+    medi:
+      url: "https://github.com/SciCompKL/MeDiPack/archive/0cfaf96e7a31a5a8941b97f84198da03a8f8bd7a.tar.gz"
+      sha256: "89ce00c962452872f228e87007cb43aaf687f721400325751e807c18b0edb914"
