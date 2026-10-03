@@ -1,0 +1,4 @@
+sources:
+  "9.8.0":
+    url: "https://github.com/dealii/dealii/releases/download/v9.8.0/dealii-9.8.0.tar.gz"
+    sha256: "d8d66aac57baad145a752d3f11cf72cfa9457e3f99ae09e5c8d5c9259a83aee1"
