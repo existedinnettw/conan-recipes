@@ -1,0 +1,4 @@
+sources:
+  "4.0.0":
+    url: "https://github.com/OpenCyphal/libcanard/archive/refs/tags/v4.0.0.tar.gz"
+    sha256: "45a3140c726f5552b23d81364ca483160238ae375f0b758b0c570e6827136e76"
