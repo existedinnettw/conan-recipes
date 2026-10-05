@@ -1,0 +1,4 @@
+sources:
+  "cci.20260919":
+    url: "https://github.com/FreeCAD/OndselSolver/archive/4be80eef02a3486cda0d78f3ccbb308d207a9639.tar.gz"
+    sha256: "701a5b6814114d3bd358700b4308e0c75c8fe86d24400d5accde0f3c11e3580a"

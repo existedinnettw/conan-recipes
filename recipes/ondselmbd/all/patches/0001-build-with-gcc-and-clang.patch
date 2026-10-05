@@ -1,0 +1,184 @@
+diff --git a/FreeCADMbD/DiagonalMatrix.h b/FreeCADMbD/DiagonalMatrix.h
+index 556b7f7..f3aca48 100644
+--- a/FreeCADMbD/DiagonalMatrix.h
++++ b/FreeCADMbD/DiagonalMatrix.h
+@@ -56,7 +56,7 @@ namespace MbD {
+     };
+ 
+     template<>
+-    DiagMatDsptr DiagonalMatrix<double>::Identity3by3 = []() {
++    inline DiagMatDsptr DiagonalMatrix<double>::Identity3by3 = []() {
+         auto identity3by3 = DiagonalMatrix<double>::With(3);
+         for (size_t i = 0; i < 3; i++)
+         {
+@@ -65,7 +65,7 @@ namespace MbD {
+         return identity3by3;
+     }();
+     template<>
+-    DiagMatDsptr DiagonalMatrix<double>::Identity4by4 = []() {
++    inline DiagMatDsptr DiagonalMatrix<double>::Identity4by4 = []() {
+         auto identity4by4 = DiagonalMatrix<double>::With(4);
+         for (size_t i = 0; i < 4; i++)
+         {
+diff --git a/FreeCADMbD/GearConstraintIJ.h b/FreeCADMbD/GearConstraintIJ.h
+index dd86834..0782176 100644
+--- a/FreeCADMbD/GearConstraintIJ.h
++++ b/FreeCADMbD/GearConstraintIJ.h
+@@ -9,7 +9,7 @@
+ #pragma once
+ 
+ #include "ConstraintIJ.h"
+-#include "OrbitAngleZIecJec.h"
++#include "OrbitAnglezIecJec.h"
+ 
+ namespace MbD {
+     class GearConstraintIJ : public ConstraintIJ
+diff --git a/FreeCADMbD/GearConstraintIqcJc.cpp b/FreeCADMbD/GearConstraintIqcJc.cpp
+index a851de3..860c63b 100644
+--- a/FreeCADMbD/GearConstraintIqcJc.cpp
++++ b/FreeCADMbD/GearConstraintIqcJc.cpp
+@@ -8,7 +8,7 @@
+  
+ #include "GearConstraintIqcJc.h"
+ #include "EndFrameqc.h"
+-#include "OrbitAngleZIeqcJec.h"
++#include "OrbitAnglezIeqcJec.h"
+ 
+ using namespace MbD;
+ 
+diff --git a/FreeCADMbD/GearConstraintIqcJqc.cpp b/FreeCADMbD/GearConstraintIqcJqc.cpp
+index acfbd0a..3cfbf92 100644
+--- a/FreeCADMbD/GearConstraintIqcJqc.cpp
++++ b/FreeCADMbD/GearConstraintIqcJqc.cpp
+@@ -8,7 +8,7 @@
+  
+ #include "GearConstraintIqcJqc.h"
+ #include "EndFrameqc.h"
+-#include "OrbitAngleZIeqcJeqc.h"
++#include "OrbitAnglezIeqcJeqc.h"
+ 
+ using namespace MbD;
+ 
+diff --git a/FreeCADMbD/OrbitAnglezIecJec.cpp b/FreeCADMbD/OrbitAnglezIecJec.cpp
+index 9363ee2..0dc6cf7 100644
+--- a/FreeCADMbD/OrbitAnglezIecJec.cpp
++++ b/FreeCADMbD/OrbitAnglezIecJec.cpp
+@@ -9,7 +9,7 @@
+ #include <cmath>
+ #include <numbers>
+ 
+-#include "OrbitAngleZIecJec.h"
++#include "OrbitAnglezIecJec.h"
+ #include "Numeric.h"
+ #include "SimulationStoppingError.h"
+ 
+diff --git a/FreeCADMbD/OrbitAnglezIeqcJec.cpp b/FreeCADMbD/OrbitAnglezIeqcJec.cpp
+index 1417f3c..1280446 100644
+--- a/FreeCADMbD/OrbitAnglezIeqcJec.cpp
++++ b/FreeCADMbD/OrbitAnglezIeqcJec.cpp
+@@ -6,7 +6,7 @@
+  *   See LICENSE file for details about copyright.                         *
+  ***************************************************************************/
+  
+-#include "OrbitAngleZIeqcJec.h"
++#include "OrbitAnglezIeqcJec.h"
+ #include "DispCompIeqcJecIe.h"
+ 
+ using namespace MbD;
+diff --git a/FreeCADMbD/OrbitAnglezIeqcJec.h b/FreeCADMbD/OrbitAnglezIeqcJec.h
+index 179f27c..f319447 100644
+--- a/FreeCADMbD/OrbitAnglezIeqcJec.h
++++ b/FreeCADMbD/OrbitAnglezIeqcJec.h
+@@ -8,7 +8,7 @@
+  
+ #pragma once
+ 
+-#include "OrbitAngleZIecJec.h"
++#include "OrbitAnglezIecJec.h"
+ 
+ namespace MbD {
+     class OrbitAngleZIeqcJec : public OrbitAngleZIecJec
+diff --git a/FreeCADMbD/OrbitAnglezIeqcJeqc.cpp b/FreeCADMbD/OrbitAnglezIeqcJeqc.cpp
+index 38c5672..1f9fe97 100644
+--- a/FreeCADMbD/OrbitAnglezIeqcJeqc.cpp
++++ b/FreeCADMbD/OrbitAnglezIeqcJeqc.cpp
+@@ -6,7 +6,7 @@
+  *   See LICENSE file for details about copyright.                         *
+  ***************************************************************************/
+  
+-#include "OrbitAngleZIeqcJeqc.h"
++#include "OrbitAnglezIeqcJeqc.h"
+ #include "DispCompIeqcJeqcIe.h"
+ 
+ using namespace MbD;
+diff --git a/FreeCADMbD/OrbitAnglezIeqcJeqc.h b/FreeCADMbD/OrbitAnglezIeqcJeqc.h
+index 5f2b80e..770d74a 100644
+--- a/FreeCADMbD/OrbitAnglezIeqcJeqc.h
++++ b/FreeCADMbD/OrbitAnglezIeqcJeqc.h
+@@ -8,7 +8,7 @@
+  
+ #pragma once
+ 
+-#include "OrbitAngleZIeqcJec.h"
++#include "OrbitAnglezIeqcJec.h"
+ 
+ namespace MbD {
+     class OrbitAngleZIeqcJeqc : public OrbitAngleZIeqcJec
+diff --git a/FreeCADMbD/SparseVector.h b/FreeCADMbD/SparseVector.h
+index 1c0a92c..3a5d99c 100644
+--- a/FreeCADMbD/SparseVector.h
++++ b/FreeCADMbD/SparseVector.h
+@@ -12,6 +12,8 @@
+ #include <cmath>
+ #include <sstream> 
+ #include <iomanip>
++#include <fstream>
++#include <limits>
+ 
+ namespace MbD {
+     template<typename T>
+@@ -32,7 +34,7 @@ namespace MbD {
+                     if (i == 1) value = element;
+                     i++;
+                 }
+-                insert(std::pair<const size_t, double>(index, value));
++                this->insert(std::pair<const size_t, double>(index, value));
+             }
+         }
+         //virtual ~SparseVector() {}
+@@ -60,7 +62,7 @@ namespace MbD {
+     template<typename T>
+     inline double SparseVector<T>::rootMeanSquare()
+     {
+-        return std::sqrt(sumOfSquares() / numberOfElements());
++        return std::sqrt(this->sumOfSquares() / this->numberOfElements());
+     }
+ 
+     template<typename T>
+@@ -101,7 +103,7 @@ namespace MbD {
+     template<>
+     inline void SparseVector<double>::zeroSelf()
+     {
+-        clear();
++        this->clear();
+     }
+ 
+     template<typename T>
+@@ -154,7 +156,7 @@ namespace MbD {
+     inline void SparseVector<T>::outputCSV(std::string filename)
+     {
+         std::ofstream os(filename);
+-        os << to_CSV();
++        os << this->to_CSV();
+         os << std::endl;
+     }
+ 
+@@ -162,7 +164,7 @@ namespace MbD {
+     inline void SparseVector<T>::appendCSV(std::string filename)
+     {
+         std::ofstream os(filename, std::ios_base::app);
+-        os << to_CSV();
++        os << this->to_CSV();
+         os << std::endl;
+     }
+ 
