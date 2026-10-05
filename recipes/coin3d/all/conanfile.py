@@ -165,7 +165,10 @@ class Coin3DConan(ConanFile):
             self.cpp_info.defines = ["COIN_DLL" if self.options.shared else "COIN_NOT_DLL"]
             if not self.options.shared:
                 self.cpp_info.system_libs = ["gdi32", "user32"]
-        elif self.settings.os in ("Linux", "FreeBSD"):
+        elif self.settings.os == "Linux":
             self.cpp_info.system_libs = ["m", "pthread", "dl"]
+        elif self.settings.os == "FreeBSD":
+            # dlopen() is in libc there; upstream links ${CMAKE_DL_LIBS}, which is empty.
+            self.cpp_info.system_libs = ["m", "pthread"]
         elif self.settings.os == "Macos":
             self.cpp_info.frameworks = ["CoreFoundation", "CoreGraphics"]
