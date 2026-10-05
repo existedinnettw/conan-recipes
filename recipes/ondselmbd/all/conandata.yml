@@ -1,0 +1,14 @@
+sources:
+  "cci.20251209":
+    url: "https://github.com/Ondsel-Development/OndselMbD/archive/c441f7233b6e51ecd7a98c4aafa4edcb7881fe3d.tar.gz"
+    sha256: "b3701af535fac2d9c369bd620a6ac7d632cae21e8fa30d200b4398dd236ff752"
+patches:
+  "cci.20251209":
+    - patch_file: "patches/0001-build-with-gcc-and-clang.patch"
+      patch_description: >-
+        Upstream only builds with MSVC on Windows: include the OrbitAnglez*
+        headers by their real (lowercase z) names, qualify SparseVector's
+        calls into its std::map base with this-> and include <fstream> and
+        <limits>, and define DiagonalMatrix's static identity matrices inline
+        so every object file using the header no longer defines them.
+      patch_type: "portability"
