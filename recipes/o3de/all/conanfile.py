@@ -84,10 +84,6 @@ class O3DEConan(ConanFile):
             self.requires("xorg/system", transitive_headers=True)
             self.requires("xkbcommon/1.13.1", transitive_headers=True)
 
-    def build_requirements(self):
-        if self.options.get_safe("with_xcb"):
-            self.tool_requires("pkgconf/[>=2.1 <3]")
-
     def system_requirements(self):
         # xcb-xinput is not among xorg/system's packages.
         if self.options.get_safe("with_xcb"):

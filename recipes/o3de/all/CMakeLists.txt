@@ -43,9 +43,14 @@ endforeach()
 if(O3DE_WITH_XCB)
   find_package(xorg REQUIRED CONFIG)
   find_package(xkbcommon REQUIRED CONFIG)
-  find_package(PkgConfig REQUIRED)
-  # Not among xorg/system's components.
-  pkg_check_modules(XCB_XINPUT REQUIRED IMPORTED_TARGET xcb-xinput)
+  # Not among xorg/system's components (libxcb-xinput-dev on Debian/Ubuntu).
+  find_path(XCB_XINPUT_INCLUDE_DIR xcb/xinput.h REQUIRED)
+  find_library(XCB_XINPUT_LIBRARY xcb-xinput REQUIRED)
+  add_library(xcb-xinput UNKNOWN IMPORTED)
+  set_target_properties(xcb-xinput PROPERTIES
+    IMPORTED_LOCATION "${XCB_XINPUT_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${XCB_XINPUT_INCLUDE_DIR}"
+  )
 endif()
 
 # Settings every O3DE target and every consumer compiles with.
@@ -225,7 +230,7 @@ if(O3DE_WITH_XCB)
   # Public: the installed Xcb headers include xcb and xkbcommon headers.
   target_link_libraries(AzFramework PUBLIC
     xorg::xcb xorg::xcb-xkb xorg::xcb-xfixes xorg::xcb-randr xorg::xcb-keysyms
-    xkbcommon::libxkbcommon xkbcommon::libxkbcommon-x11 PkgConfig::XCB_XINPUT
+    xkbcommon::libxkbcommon xkbcommon::libxkbcommon-x11 xcb-xinput
   )
 else()
   # Upstream's "wayland" window manager: no native window or input implementation.
