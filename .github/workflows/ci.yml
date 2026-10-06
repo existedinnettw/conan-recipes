@@ -114,6 +114,10 @@ jobs:
         run: |
           conan profile detect --force
           crudini --set ~/.conan2/profiles/default settings compiler.cppstd 23
+          # When a source's origin is down (e.g. ftp.gnu.org), fetch ConanCenter's copy.
+          # core.* settings are only read from global.conf, not from `-c`.
+          echo "core.sources:download_urls=['origin', 'https://c3i.jfrog.io/artifactory/conan-center-backup-sources/']" \
+            >> "$(conan config home)/global.conf"
 
       - name: Build and test packages
         env:
