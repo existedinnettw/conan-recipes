@@ -53,6 +53,19 @@ class OpenUSDConan(ConanFile):
             raise ConanInvalidConfiguration(
                 f"{self.ref}: with_opengl=True requires with_imaging=True"
             )
+        if self.options.with_opengl and self.settings.os in (
+            "iOS",
+            "tvOS",
+            "watchOS",
+            "visionOS",
+        ):
+            raise ConanInvalidConfiguration(
+                f"{self.ref}: with_opengl=True is not supported on embedded Apple targets"
+            )
+        if self.options.with_opengl and self.settings.os == "FreeBSD":
+            raise ConanInvalidConfiguration(
+                f"{self.ref}: with_opengl=True is not supported on FreeBSD"
+            )
 
     def requirements(self):
         # OpenUSD 26.08 is tested upstream with oneTBB 2021.9. Keep the range on
@@ -80,7 +93,7 @@ class OpenUSDConan(ConanFile):
                 transitive_headers=True,
                 transitive_libs=True,
             )
-            if self.settings.os in ("Linux", "FreeBSD"):
+            if self.settings.os == "Linux":
                 self.requires(
                     "xorg/system",
                     transitive_headers=True,
@@ -198,7 +211,7 @@ class OpenUSDConan(ConanFile):
             self.cpp_info.requires.append("opensubdiv::osdcpu")
             if self.options.with_opengl:
                 self.cpp_info.requires.extend(["opensubdiv::osdgpu", "opengl::opengl"])
-                if self.settings.os in ("Linux", "FreeBSD"):
+                if self.settings.os == "Linux":
                     self.cpp_info.requires.append("xorg::x11")
 
         if not self.options.shared:
@@ -214,8 +227,7 @@ class OpenUSDConan(ConanFile):
             if self.options.with_imaging:
                 self.cpp_info.frameworks.extend(["ImageIO", "CoreGraphics"])
                 if self.options.with_opengl:
-                    ui_framework = "AppKit" if self.settings.os == "Macos" else "UIKit"
-                    self.cpp_info.frameworks.append(ui_framework)
+                    self.cpp_info.frameworks.append("AppKit")
 
         # Static builds locate resources relative to the executable rather than the
         # archive, and external plugins live outside lib/usd even for shared builds.
