@@ -1,0 +1,17 @@
+sources:
+  "2605.0":
+    o3de:
+      url: "https://github.com/o3de/o3de/archive/refs/tags/2605.0.tar.gz"
+      sha256: "b52001ab766d17c86ec6b26706166be3cb53e2d827e948eb64ca1ebe6b9874f4"
+    # O3DE's fork of RapidXML 1.13 (namespace AZ::rapidxml, AZStd allocators); AzCore
+    # cannot use stock rapidxml. Package hash from cmake/3rdParty/Platform/*/BuiltInPackages_*.cmake.
+    rapidxml:
+      url: "https://d3t6xeg4fgfoum.cloudfront.net/RapidXML-1.13-rev1-multiplatform.tar.xz"
+      sha256: "4b7b5651e47cfd019b6b295cc17bb147b65e53073eaab4a0c0d20a37ab74a246"
+    # Pure Python; run by cmake/AzAutoGen.py to generate AzNetworking's packet code.
+    jinja2:
+      url: "https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c72f3e33cef02e048281fec7ecec5f032d4aac52226b/jinja2-3.1.6.tar.gz"
+      sha256: "0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d"
+    markupsafe:
+      url: "https://files.pythonhosted.org/packages/7e/99/7690b6d4034fffd95959cbe0c02de8deb3098cc577c67bb6a24fe5d7caa7/markupsafe-3.0.3.tar.gz"
+      sha256: "722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698"

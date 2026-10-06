@@ -1,0 +1,7 @@
+# One argument per line, appended to `conan create` by the CI/CD workflows.
+# xorg/system and o3de (libxcb-xinput-dev) install the X11/xcb development packages,
+# which the runner does not have.
+-c
+tools.system.package_manager:mode=install
+-c
+tools.system.package_manager:sudo=True
