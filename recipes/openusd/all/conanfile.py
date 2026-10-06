@@ -175,6 +175,9 @@ class OpenUSDConan(ConanFile):
 
         if self.options.shared:
             self.cpp_info.libs = ["usd_ms"]
+            if self.settings.os == "Windows":
+                # OpenUSD installs the monolithic DLL alongside its import library.
+                self.cpp_info.bindirs = ["lib"]
         else:
             # A static monolithic OpenUSD relies on registration-only translation
             # units. A regular archive link discards those units, so use CMake's
@@ -198,6 +201,8 @@ class OpenUSDConan(ConanFile):
             self.cpp_info.system_libs = ["Shlwapi", "Dbghelp", "Ws2_32"]
         elif self.settings.os in ("Macos", "iOS", "tvOS", "watchOS", "visionOS"):
             self.cpp_info.frameworks = ["Foundation"]
+            if self.options.with_imaging:
+                self.cpp_info.frameworks.extend(["ImageIO", "CoreGraphics"])
 
         # Static builds locate resources relative to the executable rather than the
         # archive, and external plugins live outside lib/usd even for shared builds.
