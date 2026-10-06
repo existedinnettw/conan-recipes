@@ -71,9 +71,15 @@ class OpenUSDConan(ConanFile):
                     "with_tbb": True,
                     "with_opengl": bool(self.options.with_opengl),
                 },
+                transitive_headers=True,
+                transitive_libs=True,
             )
         if self.options.with_opengl:
-            self.requires("opengl/system")
+            self.requires(
+                "opengl/system",
+                transitive_headers=True,
+                transitive_libs=True,
+            )
 
     def build_requirements(self):
         # OpenUSD 26.08 raises its minimum CMake version to 3.27.
@@ -119,6 +125,10 @@ class OpenUSDConan(ConanFile):
         tc.cache_variables["PXR_BUILD_IMAGING"] = bool(self.options.with_imaging)
         tc.cache_variables["PXR_BUILD_USD_IMAGING"] = bool(self.options.with_imaging)
         tc.cache_variables["PXR_ENABLE_GL_SUPPORT"] = bool(self.options.with_opengl)
+        if self.settings.os in ("Macos", "iOS", "tvOS", "watchOS", "visionOS"):
+            # Embedded Apple targets otherwise default to a shared framework,
+            # overriding Conan's shared option and changing the package layout.
+            tc.cache_variables["PXR_BUILD_APPLE_FRAMEWORK"] = False
         # Metal is not represented by this recipe yet; avoid an implicit platform-
         # dependent feature when the package ID only records the options above.
         tc.cache_variables["PXR_ENABLE_METAL_SUPPORT"] = False
@@ -185,7 +195,9 @@ class OpenUSDConan(ConanFile):
         if self.settings.os in ("Linux", "FreeBSD"):
             self.cpp_info.system_libs = ["dl", "m", "pthread"]
         elif self.settings.os == "Windows":
-            self.cpp_info.system_libs = ["Shlwapi", "Dbghelp"]
+            self.cpp_info.system_libs = ["Shlwapi", "Dbghelp", "Ws2_32"]
+        elif self.settings.os in ("Macos", "iOS", "tvOS", "watchOS", "visionOS"):
+            self.cpp_info.frameworks = ["Foundation"]
 
         # Static builds locate resources relative to the executable rather than the
         # archive, and external plugins live outside lib/usd even for shared builds.
