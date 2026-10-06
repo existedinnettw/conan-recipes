@@ -16,7 +16,7 @@ class OpenUSDConan(ConanFile):
         "Universal Scene Description is a framework for interchanging and composing "
         "3D scene data"
     )
-    license = "LicenseRef-Modified-Apache-2.0"
+    license = "LicenseRef-Tomorrow-Open-Source-Technology-1.0"
     url = "https://github.com/existedinnettw/conan-recipes"
     homepage = "https://openusd.org"
     topics = ("usd", "3d", "graphics", "vfx", "scene-description")
@@ -195,8 +195,10 @@ class OpenUSDConan(ConanFile):
 
         if not self.options.shared:
             self.cpp_info.defines.append("PXR_STATIC")
-        if self.settings.os in ("Linux", "FreeBSD"):
+        if self.settings.os == "Linux":
             self.cpp_info.system_libs = ["dl", "m", "pthread"]
+        elif self.settings.os == "FreeBSD":
+            self.cpp_info.system_libs = ["m", "pthread"]
         elif self.settings.os == "Windows":
             self.cpp_info.system_libs = ["Shlwapi", "Dbghelp", "Ws2_32"]
         elif self.settings.os in ("Macos", "iOS", "tvOS", "watchOS", "visionOS"):
