@@ -8,7 +8,8 @@ from conan.tools.files import copy, get, replace_in_file
 from conan.tools.scm import Version
 from conan.tools.system import package_manager
 
-required_conan_version = ">=2.0"
+# get(excludes=...) needs Conan 2.20.
+required_conan_version = ">=2.20"
 
 
 class O3DEConan(ConanFile):
@@ -37,6 +38,10 @@ class O3DEConan(ConanFile):
         "shared": False,
         "fPIC": True,
         "with_xcb": True,
+        # AzFramework only uses libxkbcommon and libxkbcommon-x11; these would add
+        # libxml2 (and libiconv) and the Wayland libraries to the build.
+        "xkbcommon/*:xkbregistry": False,
+        "xkbcommon/*:with_wayland": False,
     }
     exports_sources = "CMakeLists.txt"
 
