@@ -205,6 +205,9 @@ class OpenUSDConan(ConanFile):
             self.cpp_info.frameworks = ["Foundation"]
             if self.options.with_imaging:
                 self.cpp_info.frameworks.extend(["ImageIO", "CoreGraphics"])
+                if self.options.with_opengl:
+                    ui_framework = "AppKit" if self.settings.os == "Macos" else "UIKit"
+                    self.cpp_info.frameworks.append(ui_framework)
 
         # Static builds locate resources relative to the executable rather than the
         # archive, and external plugins live outside lib/usd even for shared builds.
