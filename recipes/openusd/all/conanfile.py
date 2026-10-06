@@ -80,6 +80,12 @@ class OpenUSDConan(ConanFile):
                 transitive_headers=True,
                 transitive_libs=True,
             )
+            if self.settings.os in ("Linux", "FreeBSD"):
+                self.requires(
+                    "xorg/system",
+                    transitive_headers=True,
+                    transitive_libs=True,
+                )
 
     def build_requirements(self):
         # OpenUSD 26.08 raises its minimum CMake version to 3.27.
@@ -192,6 +198,8 @@ class OpenUSDConan(ConanFile):
             self.cpp_info.requires.append("opensubdiv::osdcpu")
             if self.options.with_opengl:
                 self.cpp_info.requires.extend(["opensubdiv::osdgpu", "opengl::opengl"])
+                if self.settings.os in ("Linux", "FreeBSD"):
+                    self.cpp_info.requires.append("xorg::x11")
 
         if not self.options.shared:
             self.cpp_info.defines.append("PXR_STATIC")
