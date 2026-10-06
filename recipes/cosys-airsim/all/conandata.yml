@@ -1,0 +1,4 @@
+sources:
+  "3.5.0":
+    url: "https://github.com/Cosys-Lab/Cosys-AirSim/archive/refs/tags/5.8-v3.5.0.tar.gz"
+    sha256: "0f11256c1715c44a9305942faae8d9e22af0e592594c832f525580981965fb61"
