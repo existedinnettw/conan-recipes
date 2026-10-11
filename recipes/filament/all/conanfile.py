@@ -225,6 +225,13 @@ class FilamentConan(ConanFile):
         CMakeDeps(self).generate()
 
     def build(self):
+        if self.settings.os == "Linux" and self.options.get_safe("window_system") == "egl" and \
+                self.options.with_opengl:
+            # The headless EGL backend uses OpenGL ES, which needs the "mobile" shader models;
+            # upstream only compiles them for mobile targets (FILAMENT_LINUX_IS_MOBILE would also
+            # drop the host tools such as matc). Build the materials for both.
+            replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"),
+                            "    set(MATC_TARGET desktop)", "    set(MATC_TARGET all)")
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
