@@ -1,0 +1,4 @@
+sources:
+  "1.77.3":
+    url: "https://github.com/google/filament/archive/refs/tags/v1.77.3.tar.gz"
+    sha256: "6f0904a5092760a04831a6be4fb53884488d6deded8c3e6aa541ba711c50e61b"
