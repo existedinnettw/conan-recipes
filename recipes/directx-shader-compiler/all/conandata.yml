@@ -1,0 +1,17 @@
+sources:
+  # O3DE's fork (branch release-1.8.2505.1-o3de) of DXC v1.8.2505.1: adds the dxsc tool, which
+  # O3DE's shader builder uses to patch specialization constants into shader bytecode.
+  "1.8.2505.1-o3de":
+    dxc:
+      url: "https://github.com/o3de/DirectXShaderCompiler/archive/1cc0ab76dafe08a4144e419e619a8951a3d219db.tar.gz"
+      sha256: "1b36fde66ebad5806563373cb722b3c57e8b1d580880e898b3b9d6a5e4529e42"
+    # Git submodules at the commits the fork pins (external/)
+    spirv-headers:
+      url: "https://github.com/KhronosGroup/SPIRV-Headers/archive/aa6cef192b8e693916eb713e7a9ccadf06062ceb.tar.gz"
+      sha256: "1bf0568bad1f9e30fce8d3199e54ae7ade1c16dbe913b5afd9b499149a9bb9a5"
+    spirv-tools:
+      url: "https://github.com/KhronosGroup/SPIRV-Tools/archive/a62abcb402009b9ca5975e6167c09f237f630e0e.tar.gz"
+      sha256: "7f6561171be2f314a26cb2a686d653050ee318655a89970d41ab3bef3269a4db"
+    directx-headers:
+      url: "https://github.com/microsoft/DirectX-Headers/archive/980971e835876dc0cde415e8f9bc646e64667bf7.tar.gz"
+      sha256: "b5a4b6d8806ff7f29f19879f83d015dbe8740676d4ca0b48647a789cc7773c4e"
