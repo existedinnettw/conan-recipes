@@ -1,0 +1,367 @@
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/Style.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/Style.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/Style.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/Style.cpp
+@@ -629,31 +629,6 @@
+                 {
+                     return;
+                 }
+-                // With how we setup our styles, Style::drawPrimitive gets first crack at the treeview branch indicator.
+-                // Since it doesn't care to do anything, it delegates to the base style, which is a QStyleSheetStyle.
+-                // If there is a css rule in the loaded stylesheet, the QStyleSheetStyle will follow those rules -
+-                // and NOT draw the indicator arrow.
+-                // So below, we let the QStyleSheetStyle do its thing, then we manually call into the Fusion style
+-                // to draw the arrows.
+-                // If you really don't want this, add the g_treeViewDisableDefaultArrorPainting class to your object.
+-                // I.e. Style::addClass(aQTreeView, g_treeViewDisableDefaultArrorPainting);
+-#if !defined(AZ_PLATFORM_LINUX)
+-
+-                if (qobject_cast<const QTreeView*>(widget) && !hasClass(widget, g_treeViewDisableDefaultArrorPainting))
+-                {
+-                    QStyleSheetStyle* styleSheetStyle = qobject_cast<QStyleSheetStyle*>(baseStyle());
+-                    if (styleSheetStyle)
+-                    {
+-                        QStyle* fusionStyle = styleSheetStyle->baseStyle();
+-                        if (fusionStyle && (fusionStyle != this) && (fusionStyle != styleSheetStyle))
+-                        {
+-                            QProxyStyle::drawPrimitive(element, option, painter, widget);
+-
+-                            return fusionStyle->drawPrimitive(element, option, painter, widget);
+-                        }
+-                    }
+-                }
+-#endif // !defined(AZ_PLATFORM_LINUX)
+             }
+             break;
+ 
+@@ -1103,26 +1078,6 @@
+                 break;
+             }
+ 
+-            case QStyle::PM_MenuHPlacementOffset:
+-            {
+-                const int hOffset = Menu::horizontalShadowMargin(this, option, widget, m_data->menuConfig);
+-                if (hOffset != std::numeric_limits<int>::lowest())
+-                {
+-                    return hOffset;
+-                }
+-                break;
+-            }
+-
+-            case QStyle::PM_MenuVPlacementOffset:
+-            {
+-                const int vOffset = Menu::verticalShadowMargin(this, option, widget, m_data->menuConfig);
+-                if (vOffset != std::numeric_limits<int>::lowest())
+-                {
+-                    return vOffset;
+-                }
+-                break;
+-            }
+-
+             case QStyle::PM_MenuButtonIndicator:
+             {
+                 int size = ToolButton::menuButtonIndicatorWidth(this, option, widget, m_data->toolButtonConfig);
+@@ -1153,22 +1108,6 @@
+                 const QPoint wPos = widget->pos();
+                 const QPoint gPos = widget->mapToGlobal(wPos);
+                 int retval{ 12 };
+-
+-                const QScreen* thisScreen = QGuiApplication::screenAt(gPos);
+-                if (!thisScreen)
+-                {
+-                    thisScreen = QGuiApplication::primaryScreen();
+-                }
+-                if (thisScreen)
+-                {
+-                    // We have to do this as the KDAB Dpi functions return a strange rounded value
+-                    // that means dpiScaled is always returned 12
+-                    const qreal dpi = thisScreen->handle()->logicalDpi().first;
+-                    if (dpi > 0)
+-                    {
+-                        retval = int(QStyleHelper::dpiScaled(12, dpi));
+-                    }
+-                }
+                 return retval;
+             }
+ 
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleHelpers.h b/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleHelpers.h
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleHelpers.h
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleHelpers.h
+@@ -50,13 +50,13 @@
+                     return;
+                 }
+ 
+-                if (auto styleSheet = StyleManager::styleSheetStyle(widget))
++                if (QStyle* styleSheet = StyleManager::styleSheetStyle(widget))
+                 {
+                     // For the widget and each of its children, QStyleSheetStyle::repolish clears
+                     // the existing render rules, polishes the widget and sends it a StyleChange
+                     // event. This ensure that both render rules which depend on properties, and
+                     // properties that are set in style sheets via qproperty- are correctly updated.
+-                    styleSheet->repolish(widget);
++                    styleSheet->polish(widget);
+                 }
+             });
+         }
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.cpp
+@@ -10,48 +10,46 @@
+ #include <AzCore/IO/Path/Path.h>
+ #include <AzCore/Settings/SettingsRegistryMergeUtils.h>
+ #include <AzQtComponents/Components/StyleManager.h>
+-#include <QTextStream>
+ #include <QApplication>
+ #include <QPalette>
+-AZ_PUSH_DISABLE_WARNING(4251, "-Wunknown-warning-option") // 4251: 'QFileInfo::d_ptr': class 'QSharedDataPointer<QFileInfoPrivate>' needs to have dll-interface to be used by clients of class 'QFileInfo'
++#include <QTextStream>
++AZ_PUSH_DISABLE_WARNING(4251, "-Wunknown-warning-option") // 4251: 'QFileInfo::d_ptr': class 'QSharedDataPointer<QFileInfoPrivate>' needs to
++                                                          // have dll-interface to be used by clients of class 'QFileInfo'
+ #include <QDir>
+ AZ_POP_DISABLE_WARNING
+-#include <QString>
++#include <QDebug>
+ #include <QFile>
+ #include <QFontDatabase>
+-#include <QStyleFactory>
+ #include <QPointer>
++#include <QString>
+ #include <QStyle>
++#include <QStyleFactory>
+ #include <QWidget>
+-#include <QDebug>
+-
+-#include <QtWidgets/private/qstylesheetstyle_p.h>
+ 
+-#include <AzQtComponents/Components/StylesheetPreprocessor.h>
+-#include <AzQtComponents/Utilities/QtPluginPaths.h>
+-#include <AzQtComponents/Components/StyleSheetCache.h>
++#include <AzQtComponents/Components/AutoCustomWindowDecorations.h>
+ #include <AzQtComponents/Components/Style.h>
++#include <AzQtComponents/Components/StyleSheetCache.h>
++#include <AzQtComponents/Components/StylesheetPreprocessor.h>
+ #include <AzQtComponents/Components/TitleBarOverdrawHandler.h>
+-#include <AzQtComponents/Components/AutoCustomWindowDecorations.h>
++#include <AzQtComponents/Utilities/QtPluginPaths.h>
+ 
+ namespace AzQtComponents
+ {
+ 
+-    constexpr QStringView g_styleSheetRelativePath {u"Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets"};
+-    constexpr QStringView g_styleSheetResourcePath {u":AzQtComponents/Widgets"};
+-    constexpr QStringView g_globalStyleSheetName {u"BaseStyleSheet.qss"};
+-    constexpr QStringView g_searchPathPrefix {u"AzQtComponentWidgets"};
++    constexpr QStringView g_styleSheetRelativePath{ u"Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets" };
++    constexpr QStringView g_styleSheetResourcePath{ u":AzQtComponents/Widgets" };
++    constexpr QStringView g_globalStyleSheetName{ u"BaseStyleSheet.qss" };
++    constexpr QStringView g_searchPathPrefix{ u"AzQtComponentWidgets" };
+ 
+     StyleManager* StyleManager::s_instance = nullptr;
+ 
+     static QStyle* createBaseStyle()
+     {
+         return QStyleFactory::create("Fusion");
+-
+     }
+ 
+-    void StyleManager::addSearchPaths(const QString& searchPrefix, const QString& pathOnDisk, const QString& qrcPrefix,
+-        const AZ::IO::PathView& engineRootPath)
++    void StyleManager::addSearchPaths(
++        const QString& searchPrefix, const QString& pathOnDisk, const QString& qrcPrefix, const AZ::IO::PathView& engineRootPath)
+     {
+         if (!s_instance)
+         {
+@@ -96,7 +94,7 @@
+         return true;
+     }
+ 
+-    QStyleSheetStyle* StyleManager::styleSheetStyle(const QWidget* widget)
++    QStyle* StyleManager::styleSheetStyle(const QWidget* widget)
+     {
+         Q_UNUSED(widget);
+         // widget is currently unused, but would be required if Qt::AA_ManualStyleSheetStyle was
+@@ -108,24 +106,25 @@
+             return nullptr;
+         }
+ 
+-        if (!QApplication::testAttribute(Qt::AA_ManualStyleSheetStyle))
++        QObject* pParent = s_instance->m_style->parent();
++        if (!pParent)
+         {
+-            qFatal("StyleManager::styleSheetStyle has not been implemented for automatically created QStyleSheetStyles");
+-            return nullptr;
++            return s_instance->m_style;
+         }
+ 
+-        return s_instance->m_styleSheetStyle;
++        QStyle* pStylesheetStyle = qobject_cast<QStyle*>(pParent);
++        return pStylesheetStyle ? pStylesheetStyle : s_instance->m_style.data();
+     }
+ 
+-    QStyle *StyleManager::baseStyle(const QWidget *widget)
++    QStyle* StyleManager::baseStyle(const QWidget* widget)
+     {
+         const auto sss = styleSheetStyle(widget);
+-        return sss ? sss->baseStyle() : nullptr;
++        return sss;
+     }
+ 
+     void StyleManager::repolishStyleSheet(QWidget* widget)
+     {
+-        StyleManager::styleSheetStyle(widget)->repolish(widget);
++        StyleManager::styleSheetStyle(widget)->polish(widget);
+     }
+ 
+     StyleManager::StyleManager(QObject* parent)
+@@ -148,11 +147,10 @@
+         {
+             delete m_style.data();
+             m_style.clear();
+-            m_styleSheetStyle = nullptr;
+         }
+     }
+ 
+-    void StyleManager::initialize([[maybe_unused]] QApplication* application, const AZ::IO::PathView& engineRootPath)
++    void StyleManager::initialize(QApplication* application, const AZ::IO::PathView& engineRootPath)
+     {
+         if (s_instance)
+         {
+@@ -161,9 +159,6 @@
+         }
+         s_instance = this;
+ 
+-        QApplication::setAttribute(Qt::AA_ManualStyleSheetStyle, true);
+-        QApplication::setAttribute(Qt::AA_PropagateStyleToChildren, true);
+-
+         connect(application, &QCoreApplication::aboutToQuit, this, &StyleManager::cleanupStyles);
+ 
+         initializeSearchPaths(application, engineRootPath);
+@@ -181,18 +176,25 @@
+         m_autoCustomWindowDecorations = new AutoCustomWindowDecorations(this);
+         m_autoCustomWindowDecorations->setMode(AutoCustomWindowDecorations::Mode_AnyWindow);
+ 
++        // Order matters, need to setStylesheet() first, then when we call setStyle()
++        // QT 6.8.3 implementation will create a (private) QStyleSheetStyle with our stylesheet, and use our custom QStyle class below.
++        const auto globalStyleSheet = m_stylesheetCache->loadStyleSheet(g_globalStyleSheetName.toString());
++        application->setStyleSheet(globalStyleSheet);
++
+         // Style is chained as: Style -> QStyleSheetStyle -> native, meaning any CSS limitation can be tackled in Style.cpp
+-        m_styleSheetStyle = new QStyleSheetStyle(createBaseStyle());
+-        m_style = new Style(m_styleSheetStyle);
++        m_style = new Style(createBaseStyle());
+ 
+         QApplication::setStyle(m_style);
+-        m_style->setParent(this);
+         refresh();
+ 
+-        connect(m_stylesheetCache, &StyleSheetCache::styleSheetsChanged, this, [this]
+-        {
+-            refresh();
+-        });
++        connect(
++            m_stylesheetCache,
++            &StyleSheetCache::styleSheetsChanged,
++            this,
++            [this]
++            {
++                refresh();
++            });
+     }
+ 
+     void StyleManager::cleanupStyles()
+@@ -259,7 +261,7 @@
+     void StyleManager::refresh()
+     {
+         const auto globalStyleSheet = m_stylesheetCache->loadStyleSheet(g_globalStyleSheetName.toString());
+-        m_styleSheetStyle->setGlobalSheet(globalStyleSheet);
++        qApp->setStyleSheet(globalStyleSheet);
+ 
+         // Iterate widgets and update the stylesheet (the base style has already been set)
+         auto i = m_widgetToStyleSheetMap.constBegin();
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.h b/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.h
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.h
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/StyleManager.h
+@@ -65,7 +65,7 @@
+ 
+         static bool setStyleSheet(QWidget* widget, QString styleFileName);
+ 
+-        static QStyleSheetStyle* styleSheetStyle(const QWidget* widget);
++        static QStyle* styleSheetStyle(const QWidget* widget);
+         static QStyle* baseStyle(const QWidget* widget);
+ 
+         static void repolishStyleSheet(QWidget* widget);
+@@ -118,7 +118,6 @@
+         using WidgetToStyleSheetMap = QHash<QWidget*, QString>;
+         AZ_PUSH_DISABLE_WARNING(4251, "-Wunknown-warning-option") // 4251: 'AzQtComponents::StyleManager::m_widgetToStyleSheetMap': class 'QHash<QWidget *,QString>' needs to have dll-interface to be used by clients of class 'AzQtComponents::StyleManager'
+         WidgetToStyleSheetMap m_widgetToStyleSheetMap;
+-        QStyleSheetStyle* m_styleSheetStyle = nullptr;
+ 
+         // Track the style as a QPointer, as the QApplication will delete it if it still has a pointer to it
+         QPointer<QStyle> m_style;
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/BrowseEdit.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/BrowseEdit.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/BrowseEdit.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/BrowseEdit.cpp
+@@ -41,7 +41,6 @@
+         : QFrame(parent)
+         , m_data(new BrowseEdit::InternalData)
+     {
+-        AzQtComponents::Style::addClass(this, "AzQtComponentsBrowseEdit");
+         setObjectName("browse-edit");
+         setToolTipDuration(1000 * 10);
+         setAttribute(Qt::WA_Hover, true);
+@@ -71,6 +70,8 @@
+         boxLayout->addWidget(m_data->m_attachedButton);
+         connect(m_data->m_attachedButton, &QPushButton::clicked, this, &BrowseEdit::attachedButtonTriggered);
+         setAttachedButtonIcon(QIcon(":/stylesheet/img/UI20/browse-edit.svg"));
++
++        AzQtComponents::Style::addClass(this, "AzQtComponentsBrowseEdit");
+     }
+ 
+     BrowseEdit::~BrowseEdit()
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ComboBox.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ComboBox.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ComboBox.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ComboBox.cpp
+@@ -139,7 +139,7 @@
+                     case QEvent::DynamicPropertyChange:
+                     {
+                         auto styleSheet = StyleManager::styleSheetStyle(cbWidget);
+-                        styleSheet->repolish(cbWidget);
++                        styleSheet->polish(cbWidget);
+                     }
+                     break;
+ 
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp
+@@ -169,7 +169,7 @@
+                     {
+                         if (auto styleSheet = StyleManager::styleSheetStyle(cornerWidget))
+                         {
+-                            styleSheet->repolish(cornerWidget);
++                            styleSheet->polish(cornerWidget);
+                         }
+                     }
+                     break;
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/SpinBox.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/SpinBox.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/SpinBox.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/SpinBox.cpp
+@@ -513,7 +513,7 @@
+         case QEvent::DynamicPropertyChange:
+         {
+             auto styleSheet = StyleManager::styleSheetStyle(spinBox);
+-            styleSheet->repolish(spinBox);
++            styleSheet->polish(spinBox);
+             break;
+         }
+ 
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/TreeView.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/TreeView.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/TreeView.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/TreeView.cpp
+@@ -46,7 +46,7 @@
+                         auto styleSheet = StyleManager::styleSheetStyle(widget);
+                         if (styleSheet)
+                         {
+-                            styleSheet->repolish(widget);
++                            styleSheet->polish(widget);
+                         }
+                         widget->update();
+                         break;
