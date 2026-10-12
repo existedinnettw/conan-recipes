@@ -1,8 +1,9 @@
-# Builds O3DE's core framework libraries (AzCore, AzNetworking, AzFramework) from the
-# engine source tree, replacing O3DE's own build system, which needs the whole engine,
-# a downloaded Python and its prebuilt 3rdParty packages.
-# The source and compile settings mirror Code/Framework/*/CMakeLists.txt and
-# cmake/Platform/{Common,Linux}/Configurations_*.cmake.
+# Builds O3DE libraries from the engine source tree, replacing O3DE's own build system, which
+# needs the whole engine, a downloaded Python and its prebuilt 3rdParty packages.
+# The core framework libraries (AzCore, AzNetworking, AzFramework) are described here; their
+# source and compile settings mirror Code/Framework/*/CMakeLists.txt and
+# cmake/Platform/{Common,Linux}/Configurations_*.cmake. The other engine libraries and the Gems
+# use their own CMakeLists.txt, through o3de_compat.cmake.
 cmake_minimum_required(VERSION 3.22)
 project(O3DE LANGUAGES C CXX)
 
@@ -11,6 +12,22 @@ set(O3DE_RAPIDXML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/rapidxml/RapidXML/inc
 set(O3DE_CONFIGURATION "profile" CACHE STRING "O3DE build configuration: debug, profile or release")
 set(O3DE_PYTHONPATH "" CACHE STRING "Python path holding jinja2 for cmake/AzAutoGen.py")
 option(O3DE_WITH_XCB "Linux: native windows and keyboard/mouse input through XCB" ON)
+option(O3DE_WITH_EDITOR "Editor libraries (AzQtComponents, AzToolsFramework) and the Gems' editor and builder libraries" OFF)
+set(O3DE_GEMS "" CACHE STRING "Gems to build (;-separated); the Gems they depend on are added")
+option(O3DE_WITH_ASSET_PROCESSOR "AssetProcessor, AssetProcessorBatch and AssetBuilder, and the engine data they run with (needs O3DE_WITH_EDITOR and shared libraries)" OFF)
+option(O3DE_WITH_LAUNCHER "The generic game launcher (O3DE.GameLauncher, runs a project's processed assets), and the engine data it runs with (needs shared libraries)" OFF)
+set(O3DE_EXECUTABLES)
+if(O3DE_WITH_ASSET_PROCESSOR)
+  list(APPEND O3DE_EXECUTABLES AssetProcessor AssetProcessorBatch AssetBuilder)
+endif()
+if(O3DE_WITH_LAUNCHER)
+  list(APPEND O3DE_EXECUTABLES O3DE.GameLauncher)
+endif()
+if(O3DE_EXECUTABLES)
+  # The package is an engine root: executables and Gem modules in bin, the libraries in lib.
+  set(O3DE_RUNTIME_FILES ON)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib;$ORIGIN")
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(PAL Linux)
@@ -84,9 +101,12 @@ endif()
 # Settings only O3DE's own sources compile with.
 add_library(o3de_private INTERFACE)
 target_compile_definitions(o3de_private INTERFACE AZ_BUILD_CONFIGURATION_TYPE="${O3DE_CONFIGURATION}")
-# Not for shared libraries: with GCC, hidden visibility also hides the EBus template
-# instantiations AzCore exports (AZ_INSTANTIATE_EBUS_*), and AzFramework fails to link.
-if(NOT BUILD_SHARED_LIBS)
+# Hidden visibility, as upstream (Configurations_clang.cmake): in a shared build, Gem modules
+# would otherwise share the inline symbols (e.g. component descriptors' vtables) of the first module
+# that defined them, and crash when that one is unloaded first. Not for shared libraries with GCC,
+# which also hides the EBus template instantiations AzCore exports (AZ_INSTANTIATE_EBUS_*), and
+# AzFramework fails to link.
+if(NOT BUILD_SHARED_LIBS OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(o3de_private INTERFACE -fvisibility=hidden $<$<COMPILE_LANGUAGE:CXX>:-fvisibility-inlines-hidden>)
 endif()
 
@@ -122,7 +142,11 @@ endfunction()
 # cmake/LyAutoGen.cmake's ly_add_autogen: generates sources from the target's
 # xml/json/jinja files with cmake/AzAutoGen.py.
 function(o3de_add_autogen target project_dir rules)
-  get_target_property(all_files ${target} SOURCES)
+  # o3de_compat.cmake's targets only list the C/C++ files as sources.
+  get_target_property(all_files ${target} O3DE_ALLFILES)
+  if(NOT all_files)
+    get_target_property(all_files ${target} SOURCES)
+  endif()
   set(input_files ${all_files})
   list(FILTER input_files INCLUDE REGEX ".*\\.(xml|json|jinja)$")
   set(input_files_path "${CMAKE_CURRENT_BINARY_DIR}/Azcg/Temp/${target}_input_files.txt")
@@ -203,14 +227,10 @@ o3de_add_autogen(AzNetworking "${AZNETWORKING_DIR}"
 
 # AzFramework
 set(AZFRAMEWORK_DIR "${O3DE_ROOT}/Code/Framework/AzFramework")
-set(azframework_lists
+o3de_read_files(azframework_sources
   "${AZFRAMEWORK_DIR}/AzFramework/azframework_files.cmake"
   "${AZFRAMEWORK_DIR}/Platform/${PAL}/platform_${pal}_files.cmake"
 )
-if(O3DE_WITH_XCB)
-  list(APPEND azframework_lists "${AZFRAMEWORK_DIR}/Platform/Common/Xcb/azframework_xcb_files.cmake")
-endif()
-o3de_read_files(azframework_sources ${azframework_lists})
 add_library(AzFramework ${azframework_sources})
 target_compile_definitions(AzFramework PRIVATE AZF_EXPORTS)
 target_include_directories(AzFramework
@@ -226,26 +246,34 @@ target_link_libraries(AzFramework
 )
 if(O3DE_WITH_XCB)
   target_compile_definitions(AzFramework PUBLIC PAL_TRAIT_LINUX_WINDOW_MANAGER_XCB)
-  target_include_directories(AzFramework PUBLIC "$<BUILD_INTERFACE:${AZFRAMEWORK_DIR}/Platform/Common/Xcb>")
-  # Public: the installed Xcb headers include xcb and xkbcommon headers.
-  target_link_libraries(AzFramework PUBLIC
-    xorg::xcb xorg::xcb-xkb xorg::xcb-xfixes xorg::xcb-randr xorg::xcb-keysyms
-    xkbcommon::libxkbcommon xkbcommon::libxkbcommon-x11 xcb-xinput
-  )
 else()
   # Upstream's "wayland" window manager: no native window or input implementation.
   target_compile_definitions(AzFramework PUBLIC PAL_TRAIT_LINUX_WINDOW_MANAGER_WAYLAND)
 endif()
 
-o3de_read_files(azframework_nativeui_sources
+# The native windows and input (XCB) are in AzFramework.NativeUI, as upstream
+# (Platform/Linux/platform_nativeui_linux.cmake).
+set(azframework_nativeui_lists
   "${AZFRAMEWORK_DIR}/AzFramework/azframework_nativeui_files.cmake"
   "${AZFRAMEWORK_DIR}/Platform/${PAL}/platform_nativeui_${pal}_files.cmake"
 )
+if(O3DE_WITH_XCB)
+  list(APPEND azframework_nativeui_lists "${AZFRAMEWORK_DIR}/Platform/Common/Xcb/azframework_xcb_files.cmake")
+endif()
+o3de_read_files(azframework_nativeui_sources ${azframework_nativeui_lists})
 add_library(AzFrameworkNativeUI ${azframework_nativeui_sources})
 set_target_properties(AzFrameworkNativeUI PROPERTIES OUTPUT_NAME "AzFramework.NativeUI")
 target_compile_definitions(AzFrameworkNativeUI PRIVATE AZF_EXPORTS)
 target_include_directories(AzFrameworkNativeUI PRIVATE "${AZFRAMEWORK_DIR}/Platform/Common")
 target_link_libraries(AzFrameworkNativeUI PUBLIC AzFramework PRIVATE o3de_private)
+if(O3DE_WITH_XCB)
+  target_include_directories(AzFrameworkNativeUI PUBLIC "$<BUILD_INTERFACE:${AZFRAMEWORK_DIR}/Platform/Common/Xcb>")
+  # Public: the installed Xcb headers include xcb and xkbcommon headers.
+  target_link_libraries(AzFrameworkNativeUI PUBLIC
+    xorg::xcb xorg::xcb-xkb xorg::xcb-xfixes xorg::xcb-randr xorg::xcb-keysyms
+    xkbcommon::libxkbcommon xkbcommon::libxkbcommon-x11 xcb-xinput
+  )
+endif()
 
 # Install: headers keep upstream's include roots: each library folder, plus the
 # Platform/<PAL> and Platform/Common folders as siblings, since platform headers include
@@ -272,3 +300,168 @@ install(TARGETS AzCore AzNetworking AzFramework AzFrameworkNativeUI
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+
+# Engine libraries and Gems built with their own CMakeLists.txt
+add_library(AZ::AzCore ALIAS AzCore)
+add_library(AZ::AzNetworking ALIAS AzNetworking)
+add_library(AZ::AzFramework ALIAS AzFramework)
+add_library(AZ::AzFramework.NativeUI ALIAS AzFrameworkNativeUI)
+include(o3de_compat.cmake)
+o3de_register_external(AzCore azcore)
+o3de_register_external(AzNetworking aznetworking)
+o3de_register_external(AzFramework azframework)
+o3de_register_external(AzFrameworkNativeUI azframework-nativeui)
+
+# 3rdParty packages, from Conan. Upstream's packages a target needs but which are not here
+# (DXC, azslc, PhysX, ...) leave that target out.
+o3de_add_3rdparty(RapidJSON TARGETS rapidjson REQUIRES rapidjson::rapidjson)
+o3de_add_3rdparty(Lua TARGETS lua::lua REQUIRES lua::lua)
+o3de_add_3rdparty(ZLIB TARGETS ZLIB::ZLIB REQUIRES zlib::zlib)
+o3de_add_3rdparty(zstd TARGETS ${ZSTD_TARGET} REQUIRES zstd::zstd)
+o3de_add_3rdparty(lz4 TARGETS ${LZ4_TARGET} REQUIRES lz4::lz4)
+o3de_add_3rdparty(OpenSSL TARGETS openssl::openssl REQUIRES openssl::openssl)
+foreach(package TIFF PNG Freetype meshoptimizer SQLite3 xxHash mcpp expat Qt5)
+  find_package(${package} CONFIG QUIET)
+endforeach()
+if(TARGET TIFF::TIFF)
+  o3de_add_3rdparty(TIFF TARGETS TIFF::TIFF REQUIRES libtiff::libtiff)
+endif()
+if(TARGET PNG::PNG)
+  o3de_add_3rdparty(PNG TARGETS PNG::PNG REQUIRES libpng::libpng)
+endif()
+if(TARGET Freetype::Freetype)
+  o3de_add_3rdparty(Freetype TARGETS Freetype::Freetype REQUIRES freetype::freetype)
+endif()
+if(TARGET meshoptimizer::meshoptimizer)
+  o3de_add_3rdparty(meshoptimizer TARGETS meshoptimizer::meshoptimizer REQUIRES meshoptimizer::meshoptimizer)
+endif()
+if(TARGET xxHash::xxhash)
+  # Upstream's package puts xxhash.h in an xxhash/ folder.
+  set(O3DE_XXHASH_SHIM_DIR "${CMAKE_CURRENT_BINARY_DIR}/xxhash-shim")
+  file(WRITE "${O3DE_XXHASH_SHIM_DIR}/xxhash/xxhash.h" "#pragma once\n#include <xxhash.h>\n")
+  o3de_add_3rdparty(xxhash TARGETS xxHash::xxhash REQUIRES xxhash::xxhash INCLUDE_DIRECTORIES "${O3DE_XXHASH_SHIM_DIR}")
+endif()
+if(TARGET expat::expat)
+  o3de_add_3rdparty(expat TARGETS expat::expat REQUIRES expat::expat)
+endif()
+if(TARGET mcpp::mcpp)
+  o3de_add_3rdparty(mcpp TARGETS mcpp::mcpp REQUIRES mcpp::mcpp)
+  # The shader builder's runtime dependencies (upstream copies them next to the executables):
+  # the azslc and directx-shader-compiler packages are run requirements instead.
+  o3de_add_3rdparty(azslc)
+  o3de_add_3rdparty(DirectXShaderCompilerDxc)
+  o3de_add_3rdparty(SPIRVCross)
+endif()
+if(TARGET SQLite::SQLite3)
+  o3de_add_3rdparty(SQLite TARGETS SQLite::SQLite3 REQUIRES sqlite3::sqlite3)
+endif()
+if(O3DE_WITH_EDITOR)
+  # AzQtComponents uses Qt's private headers, which upstream's Qt package exposes.
+  foreach(module Core Gui Widgets Svg Xml Network Concurrent OpenGL Test)
+    set(targets Qt5::${module})
+    if(module MATCHES "^(Core|Gui|Widgets)$")
+      list(APPEND targets Qt5::${module}Private)
+    endif()
+    o3de_add_3rdparty(Qt::${module} TARGETS ${targets} REQUIRES qt::qt${module})
+  endforeach()
+  add_library(3rdParty::Qt ALIAS 3rdParty::Qt::Core)
+endif()
+
+o3de_discover_gems("${O3DE_ROOT}")
+# Vendored in the Atom_RHI_Vulkan Gem (its 3rdParty/Find*.cmake). The Vulkan RHI's Linux headers
+# include XCB's: without XCB (headless), only the Null RHI is built.
+set(vulkan_external "${O3DE_ROOT}/Gems/Atom/RHI/Vulkan/External")
+if(O3DE_WITH_XCB)
+  o3de_add_3rdparty(glad_vulkan INCLUDE_DIRECTORIES "${vulkan_external}/glad/2.0.0-beta/include"
+                    COMPILE_DEFINITIONS VK_USE_PLATFORM_XCB_KHR TARGETS xorg::xcb REQUIRES xorg::xcb)
+endif()
+# Upstream's package only copies the Vulkan validation layer next to the binaries; the RHI
+# enables validation when the layer is installed.
+o3de_add_3rdparty(vulkan-validationlayers)
+o3de_add_3rdparty(amd_vma INCLUDE_DIRECTORIES "${vulkan_external}/vma/3.1.0-009ecd1/include"
+                  COMPILE_DEFINITIONS VMA_STATIC_VULKAN_FUNCTIONS=0 VMA_DYNAMIC_VULKAN_FUNCTIONS=0)
+add_subdirectory("${O3DE_ROOT}/Code/Framework/AtomCore" "${CMAKE_BINARY_DIR}/o3de/Code/Framework/AtomCore")
+add_subdirectory("${O3DE_ROOT}/Code/Legacy/CryCommon" "${CMAKE_BINARY_DIR}/o3de/Code/Legacy/CryCommon")
+if(O3DE_WITH_EDITOR)
+  # Not AZ_QT_COMPONENTS_STATIC when it is static: it includes a rcc_resources.h upstream does not
+  # have; the export attributes it removes do no harm in a static library.
+  add_subdirectory("${O3DE_ROOT}/Code/Framework/AzQtComponents" "${CMAKE_BINARY_DIR}/o3de/Code/Framework/AzQtComponents")
+  # The libraries the Editor and the asset builders are made of, used by the Gems' editor and
+  # builder libraries. Their executables are not built.
+  if(O3DE_WITH_ASSET_PROCESSOR)
+    # It adds AssetBuilderSDK and AssetBuilder.
+    set(asset_processor_dir Code/Tools/AssetProcessor)
+  else()
+    set(asset_processor_dir Code/Tools/AssetProcessor/AssetBuilderSDK)
+  endif()
+  foreach(dir
+      Code/Framework/AzToolsFramework Code/Editor ${asset_processor_dir}
+      Code/Tools/SceneAPI/SceneCore Code/Tools/SceneAPI/SceneData Code/Tools/SceneAPI/SceneUI)
+    add_subdirectory("${O3DE_ROOT}/${dir}" "${CMAKE_BINARY_DIR}/o3de/${dir}")
+  endforeach()
+  # AzToolsFrameworkAPI.h leaves it undefined in a monolithic build, which upstream does not
+  # build the editor libraries for.
+  if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(AzToolsFramework PRIVATE AZTF_API_EXPORT=)
+  endif()
+endif()
+if(O3DE_WITH_LAUNCHER)
+  # CrySystem is a module the launcher loads.
+  foreach(dir Code/Framework/AzGameFramework Code/Legacy/CrySystem Code/Tools/RemoteConsole Code/LauncherUnified)
+    add_subdirectory("${O3DE_ROOT}/${dir}" "${CMAKE_BINARY_DIR}/o3de/${dir}")
+  endforeach()
+  # Upstream's launchers load the Atom Gems' runtime modules through Atom_AtomBridge's runtime
+  # dependencies, but AtomBridge needs Gems this recipe does not build: the ones of them that are built.
+  set(O3DE_EXTRA_CLIENT_TARGETS
+    Atom_RHI.Private Atom_RPI.Private Atom_RHI_Null.Private Atom_RHI_Vulkan.Private Atom_Feature_Common
+    Atom_Bootstrap Atom_Component_DebugCamera AtomImGuiTools CommonFeaturesAtom ImguiAtom
+  )
+endif()
+set(O3DE_REQUESTED_GEMS ${O3DE_GEMS})
+o3de_add_gems(${O3DE_GEMS})
+if(O3DE_WITH_ASSET_PROCESSOR)
+  # Upstream's builders load the Atom Gems' runtime and editor modules (which reflect the asset
+  # types, e.g. Atom_RPI.Editor for passes) through Atom_AtomBridge.Builders' runtime dependencies,
+  # but AtomBridge needs Gems this recipe does not build: the ones of them that are built.
+  # "A|B" stands for the first of them that is built: CommonFeaturesAtom.Editor needs
+  # AtomToolsFramework (Python); its runtime module reflects the asset types too.
+  set(O3DE_EXTRA_BUILDER_TARGETS
+    Atom_RHI.Private Atom_RPI.Builders Atom_RPI.Editor Atom_RHI_Null.Private Atom_RHI_Null.Builders
+    Atom_Feature_Common.Builders Atom_Feature_Common.Editor Atom_Bootstrap AtomShader.Builders
+    Atom_Component_DebugCamera Atom_RHI_Vulkan.Private Atom_RHI_Vulkan.Builders
+    "CommonFeaturesAtom.Editor|CommonFeaturesAtom" "ImguiAtom"
+  )
+endif()
+o3de_finalize()
+
+if(O3DE_RUNTIME_FILES)
+  # The engine data the executables run with, at the package root (the engine root they find by
+  # looking for engine.json above their folder): the engine's settings and assets, and the
+  # selected Gems' manifests, settings and assets. engine.json lists only those Gems.
+  get_property(selected_gems GLOBAL PROPERTY O3DE_SELECTED_GEMS)
+  file(READ "${O3DE_ROOT}/engine.json" engine_json)
+  set(subdirectories "[]")
+  foreach(gem IN LISTS selected_gems)
+    get_property(gem_root GLOBAL PROPERTY "@GEMROOT:${gem}@")
+    file(RELATIVE_PATH rel "${O3DE_ROOT}" "${gem_root}")
+    string(JSON n LENGTH "${subdirectories}")
+    string(JSON subdirectories SET "${subdirectories}" ${n} "\"${rel}\"")
+    install(FILES "${gem_root}/gem.json" DESTINATION "${rel}")
+    foreach(data_dir Assets Registry)
+      if(IS_DIRECTORY "${gem_root}/${data_dir}")
+        install(DIRECTORY "${gem_root}/${data_dir}" DESTINATION "${rel}")
+      endif()
+    endforeach()
+  endforeach()
+  string(JSON engine_json SET "${engine_json}" external_subdirectories "${subdirectories}")
+  foreach(key projects templates repos)
+    string(JSON engine_json SET "${engine_json}" ${key} "[]")
+  endforeach()
+  file(WRITE "${CMAKE_BINARY_DIR}/engine.json" "${engine_json}\n")
+  install(FILES "${CMAKE_BINARY_DIR}/engine.json" DESTINATION .)
+  install(DIRECTORY "${O3DE_ROOT}/Registry" "${O3DE_ROOT}/Assets" DESTINATION .)
+  # Atom_Feature_Common's SceneSrgAll.azsli includes the Terrain Gem's scene SRG partial, which shader
+  # includes find under <engine root>/Gems whether Terrain is used or not.
+  install(FILES "${O3DE_ROOT}/Gems/Terrain/Assets/Shaders/Terrain/SceneSrg.azsli"
+          DESTINATION Gems/Terrain/Assets/Shaders/Terrain)
+endif()

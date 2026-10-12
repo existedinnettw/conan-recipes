@@ -5,3 +5,15 @@
 tools.system.package_manager:mode=install
 -c
 tools.system.package_manager:sudo=True
+# The Gems (on by default) need Clang, like upstream's Linux build; only o3de is built with
+# the runner's Clang 18, against the dependencies built with its GCC (same libstdc++).
+-s
+o3de/*:compiler=clang
+-s
+o3de/*:compiler.version=18
+-s
+o3de/*:compiler.libcxx=libstdc++11
+-s
+o3de/*:compiler.cppstd=23
+-c
+o3de/*:tools.build:compiler_executables={"c": "clang-18", "cpp": "clang++-18"}

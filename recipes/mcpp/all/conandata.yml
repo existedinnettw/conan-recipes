@@ -1,0 +1,11 @@
+sources:
+  "2.7.2-o3de":
+    url: "https://downloads.sourceforge.net/project/mcpp/mcpp/V.2.7.2/mcpp-2.7.2.tar.gz"
+    sha256: "3b9b4421888519876c4fc68ade324a3bbd81ceeb7092ecdbbc2055099fcb8864"
+patches:
+  "2.7.2-o3de":
+    # From https://github.com/o3de/3p-package-source/blob/70f0b7b5257bf7cf935bf1cfd270e1b53ccead18/package-system/mcpp/mcpp_2.7.2_az.patch
+    - patch_file: "patches/2.7.2-o3de/0001-o3de-mcpp-2.7.2_az.patch"
+      patch_description: "O3DE's mcpp 2.7.2_az: include-report callback, extern \"C\" and const argv in the
+        library API, MCPP_-prefixed output destinations, aarch64 in config.guess"
+      patch_type: "conan"

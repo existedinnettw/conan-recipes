@@ -11,6 +11,19 @@
 #include <AzCore/std/string/string.h>
 #include <AzNetworking/Utilities/IpAddress.h>
 #include <AzFramework/Input/Channels/InputChannelId.h>
+#if defined(O3DE_TEST_ATOM)
+#include <Atom/RHI.Reflect/Format.h>
+#endif
+#if defined(O3DE_TEST_EDITOR)
+#include <AzQtComponents/Utilities/Conversions.h>
+#include <AzToolsFramework/API/ToolsApplicationAPI.h>
+#endif
+#if defined(O3DE_TEST_GEM_MODULES)
+#include <AzCore/Module/Module.h>
+
+// AZ_DECLARE_MODULE_CLASS in a monolithic build
+extern "C" AZ::Module* CreateModuleClass_Gem_Atom_RPI_Private();
+#endif
 
 #include <cstdio>
 
@@ -58,6 +71,23 @@ int main()
         std::printf("Input channel: %s\n", channel.GetName());
 
         result = (AZStd::string(buffer.GetString()).find("yaw") == AZStd::string::npos) ? 1 : 0;
+
+#if defined(O3DE_TEST_ATOM)
+        std::printf("Atom RHI format: %s, %u bytes per pixel\n", AZ::RHI::ToString(AZ::RHI::Format::R8G8B8A8_UNORM),
+                    AZ::RHI::GetFormatSize(AZ::RHI::Format::R8G8B8A8_UNORM));
+        result |= AZ::RHI::GetFormatSize(AZ::RHI::Format::R8G8B8A8_UNORM) == 4 ? 0 : 1;
+#endif
+#if defined(O3DE_TEST_GEM_MODULES)
+        AZ::Module* rpiModule = CreateModuleClass_Gem_Atom_RPI_Private();
+        std::printf("Atom RPI Gem module: %zu system components\n", rpiModule->GetRequiredSystemComponents().size());
+        result |= rpiModule->GetRequiredSystemComponents().empty() ? 1 : 0;
+        delete rpiModule;
+#endif
+#if defined(O3DE_TEST_EDITOR)
+        const QColor color = AzQtComponents::toQColor(AZ::Color(1.0f, 0.5f, 0.0f, 1.0f));
+        std::printf("AzQtComponents color: %s\n", color.name().toUtf8().constData());
+        result |= color.red() == 255 ? 0 : 1;
+#endif
         // Reflection contexts must be emptied before they are destroyed.
         serializeContext.EnableRemoveReflection();
         Pose::Reflect(serializeContext);

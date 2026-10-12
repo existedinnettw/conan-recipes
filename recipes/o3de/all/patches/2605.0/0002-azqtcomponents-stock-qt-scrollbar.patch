@@ -1,0 +1,16 @@
+diff --git a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp
+--- a/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp
++++ b/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp
+@@ -306,10 +306,10 @@
+     {
+         Q_UNUSED(config);
+ 
+-        auto styleSheetStyle = qobject_cast<QStyleSheetStyle*>(style->baseStyle());
++        QStyle* styleSheetStyle = style->baseStyle();
+         if (styleSheetStyle)
+         {
+-            styleSheetStyle->QWindowsStyle::drawComplexControl(QStyle::CC_ScrollBar, option, painter, widget);
++            styleSheetStyle->drawComplexControl(QStyle::CC_ScrollBar, option, painter, widget);
+             return true;
+         }
+ 

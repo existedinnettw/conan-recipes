@@ -15,3 +15,21 @@ sources:
     markupsafe:
       url: "https://files.pythonhosted.org/packages/7e/99/7690b6d4034fffd95959cbe0c02de8deb3098cc577c67bb6a24fe5d7caa7/markupsafe-3.0.3.tar.gz"
       sha256: "722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698"
+patches:
+  "2605.0":
+    # O3DE 2605.0's AzQtComponents uses additions of O3DE's own Qt 5.15 build (QStyleSheetStyle
+    # exported, Qt::AA_ManualStyleSheetStyle, QStyleSheetStyle::setGlobalSheet,
+    # QStyle::PM_Menu*PlacementOffset) that Conan's Qt does not have. Upstream's development
+    # branch dropped them when moving to stock Qt 6.
+    - patch_file: "patches/2605.0/0001-azqtcomponents-stock-qt-style-manager.patch"
+      patch_description: "Let Qt create the QStyleSheetStyle from the application style sheet, and use it as
+        a QStyle (AzQtComponents part of upstream's 'Adapt style manager', with QPointer::data() for Qt 5)"
+      patch_type: "backport"
+      patch_source: "https://github.com/o3de/o3de/commit/df29cb5e6096311ba33d75afc7930c30a6ffd96e"
+      base_path: "o3de"
+    - patch_file: "patches/2605.0/0002-azqtcomponents-stock-qt-scrollbar.patch"
+      patch_description: "Draw scroll bars through the style sheet style as a QStyle, as upstream's
+        development branch does"
+      patch_type: "backport"
+      patch_source: "https://github.com/o3de/o3de/blob/development/Code/Framework/AzQtComponents/AzQtComponents/Components/Widgets/ScrollBar.cpp"
+      base_path: "o3de"
