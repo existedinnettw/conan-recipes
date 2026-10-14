@@ -1,0 +1,15 @@
+sources:
+  "10.0.0":
+    chrono:
+      url: "https://github.com/projectchrono/chrono/archive/refs/tags/10.0.0.tar.gz"
+      sha256: "806e5e24a06f26bbd42344dd1f13d75e3214c9eb29901553574b9c87217d8722"
+    # git submodule src/chrono_thirdparty/fmu-forge at tag 10.0.0 (empty in the
+    # GitHub archive); used only by Chrono::FMI.
+    fmu-forge:
+      url: "https://github.com/projectchrono/fmu-forge/archive/3a1c901554f9ebe30ef7d2b03b7342f34831dff4.tar.gz"
+      sha256: "04c874325b79ffccda2e4644a265e5f33fe941d9c4f2bdcad671533ee9d5f58b"
+    # Chrono::Modal needs Spectra's Krylov-Schur solver, which only exists on its
+    # develop branch (no release has it). Header-only, used by Chrono's .cpp files.
+    spectra:
+      url: "https://github.com/yixuan/spectra/archive/c4775ea4f2bbb10f95d4c4c4b7554f6ebcf0e9e7.tar.gz"
+      sha256: "79ae261f2a8ffa68d924c101d94bc7f092503123295d4845dd51bd12c18d5191"
