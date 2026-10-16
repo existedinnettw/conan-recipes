@@ -1,0 +1,12 @@
+sources:
+  "5.3.1":
+    url: "https://github.com/NVIDIA-Omniverse/PhysX/archive/refs/tags/105.1-physx-5.3.1.tar.gz"
+    sha256: "56b7d4f5e3816d3a3ba03645bb52b9035206b574ffc1731bf55ea10f82aebe79"
+patches:
+  "5.3.1":
+    - patch_file: "patches/0001-sapien-allow-oblong-gpu-convex.patch"
+      patch_description: >-
+        SAPIEN's PhysX fork (tag 105.1-physx-5.3.1.patch0): cook GPU data for oblong
+        convex hulls instead of failing the extent/radius check
+      patch_type: "conan"
+      patch_source: "https://github.com/sapien-sim/PhysX/commit/8026efddef81130fb97ec3b4a51da66fab39f09d"
