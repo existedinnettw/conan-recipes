@@ -1,0 +1,41 @@
+sources:
+  "3.0.3":
+    sapien:
+      url: "https://github.com/haosulab/SAPIEN/archive/refs/tags/3.0.3.tar.gz"
+      sha256: "09a396b1762037830c101f4f7bbc41d10d88b7bb94da85ee5fcea271e780a456"
+    # git submodule 3rd_party/sapien-vulkan-2 at tag 3.0.3 (the renderer, built in-tree).
+    sapien-vulkan-2:
+      url: "https://github.com/haosulab/sapien-vulkan-2/archive/2ad24e1e96d88d3dd00fb1a7821ffcef42ab1ed9.tar.gz"
+      sha256: "b4fb1a251e1f11d6ed0ac5599375e6903aa62d9a755cd63ff19bf83ad89923c9"
+    # sapien-vulkan-2's FetchContent pins (cmake/imgui.cmake); compiled into libsvulkan2.
+    imgui:
+      url: "https://github.com/ocornut/imgui/archive/ef07ddf087c879baff8c0cac0ff1f40b7f0f060c.tar.gz"
+      sha256: "6aca917c2903c22ec74b66331d32834debfa48543fc920f3a3a4152646e0672f"
+    imguizmo:
+      url: "https://github.com/CedricGuillemet/ImGuizmo/archive/refs/tags/1.83.tar.gz"
+      sha256: "e6d05c5ebde802df7f6c342a06bc675bd2aa1c754d2d96755399a182187098a8"
+    imguifiledialog:
+      url: "https://github.com/aiekick/ImGuiFileDialog/archive/refs/tags/v0.6.5.tar.gz"
+      sha256: "3fac0f2cfc92b3f2c806e6743236467d0f691e54b1747a3955b82ef28b13e2fa"
+patches:
+  "3.0.3":
+    - patch_file: "patches/0001-sapien-logger-runtime-format.patch"
+      patch_description: "Logger wrappers: run-time format strings and plain enums for spdlog/fmt newer than spdlog 1.8"
+      patch_type: "portability"
+    - patch_file: "patches/0002-svulkan2-logger-runtime-format.patch"
+      patch_description: "Same for the sapien-vulkan-2 logger"
+      patch_type: "portability"
+      base_path: "3rd_party/sapien-vulkan-2"
+    - patch_file: "patches/0003-svulkan2-include-cstdint.patch"
+      patch_description: "Include <cstdint> where uint32_t is used (GCC 15+ no longer pulls it in)"
+      patch_type: "portability"
+      base_path: "3rd_party/sapien-vulkan-2"
+    - patch_file: "patches/0004-sapien-physx-engine-without-cuda.patch"
+      patch_description: "Build the CUDA context code only with SAPIEN_CUDA (PhysX enables PX_SUPPORT_GPU_PHYSX on Linux)"
+      patch_type: "portability"
+    - patch_file: "patches/0005-svulkan2-match-full-pci-without-cuda.patch"
+      patch_description: >-
+        Match SAPIEN's full PCI device hint without CUDA interop too (otherwise only the PCI
+        domain is compared with the bus, and no GPU is found when its bus is not 0)
+      patch_type: "bugfix"
+      base_path: "3rd_party/sapien-vulkan-2"

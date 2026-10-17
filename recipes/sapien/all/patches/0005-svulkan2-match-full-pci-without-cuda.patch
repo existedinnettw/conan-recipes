@@ -1,0 +1,19 @@
+--- a/src/core/instance.cpp
++++ b/src/core/instance.cpp
+@@ -541,6 +541,16 @@
+       }
+     } catch (std::runtime_error const &) {
+     }
++#else
++    // SAPIEN asks for "pci:<domain>:<bus>:<device>.<function>" (Device::getPciString).
++    {
++      char full[32];
++      std::snprintf(full, sizeof(full), "%04x:%02x:%02x.%1x", info.pci[0], info.pci[1],
++                    info.pci[2], info.pci[3]);
++      if (pciString == full) {
++        return 1000;
++      }
++    }
+   #endif
+ 
+     // only bus is provided
