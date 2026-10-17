@@ -1,0 +1,4 @@
+sources:
+  "0.3.2":
+    url: "https://github.com/jsonrpcx/json-rpc-cxx/archive/refs/tags/v0.3.2.tar.gz"
+    sha256: "2db632c7bca585e8af284f859d49f1e8ee65560f6b5973858996a098bec00593"
