@@ -1,0 +1,4 @@
+sources:
+  "2.7.2":
+    url: "https://github.com/OpenAutomationTechnologies/openPOWERLINK_V2/archive/refs/tags/V2.7.2.tar.gz"
+    sha256: "4210151112d7292eaa9b0474cbda7fa434c8da8353e47406b7334b08cf684b17"
