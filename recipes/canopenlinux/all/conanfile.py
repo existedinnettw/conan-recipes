@@ -18,7 +18,7 @@ class CANopenLinuxConan(ConanFile):
     no_copy_source = True
 
     def requirements(self):
-        self.requires("canopennode/4.0.378", transitive_headers=True)
+        self.requires("canopennode/[>=4.0.378 <5]", transitive_headers=True)
 
     def validate(self):
         if self.settings.os != "Linux":

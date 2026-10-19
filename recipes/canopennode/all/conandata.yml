@@ -2,4 +2,6 @@ sources:
   "4.0.378":
     url: "https://github.com/CANopenNode/CANopenNode/archive/835bae566475e79d0f2c2f0fd35153e1a092be11.tar.gz"
     sha256: "85fdc61ee60a6bc65863f891605725138ecd2e7d287f7ba87fc1ce2804c6e8a1"
-
+  "4.1":
+    url: "https://github.com/CANopenNode/CANopenNode/archive/refs/tags/v4.1.tar.gz"
+    sha256: "c48bfb5a5205bf745d77b837be8d1c819cc8fe0e812b3b6fc1fda0b9641295f8"
