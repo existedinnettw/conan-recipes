@@ -1,0 +1,13 @@
+sources:
+  "0.1.7":
+    basalt:
+      url: "https://gitlab.com/VladyslavUsenko/basalt/-/archive/0.1.7/basalt-0.1.7.tar.gz"
+      sha256: "1b5c25df02ff4917183a97feee042d97042141cdf1954639fa69900111ad1122"
+    # rosbag storage, built into the library as upstream's vcpkg overlay port does
+    # (vcpkg/ports/rosbag), from the same commits.
+    ros_comm:
+      url: "https://github.com/ros/ros_comm/archive/194c776737134a429619f6851f1850734843e210.tar.gz"
+      sha256: "27f9f6c9b744baa377c89b27d1c3c0dad25265ca4d335cf00af5778d2e2f7d9c"
+    roscpp_core:
+      url: "https://github.com/NikolausDemmel/roscpp_core/archive/1a74781ce707b1a2198d1bd6799b892b3c1fa195.tar.gz"
+      sha256: "e71563b60b177e8ee607944a2dfd60615f53966359fc1a0f771a6eecbbfb6703"
