@@ -77,10 +77,12 @@ class CanopenStackConan(ConanFile):
         # override the weak callbacks across a DLL boundary.
         if self.options.shared and self.settings.os == "Windows":
             raise ConanInvalidConfiguration(f"{self.ref} does not export symbols and cannot be built as a DLL")
+        # The counts size arrays in the public structs (and CO_EMCY_N - 1 indexes
+        # the EMCY table), so zero is not a valid value.
         for name in ("ssdo_n", "csdo_n", "emcy_n", "rpdo_n", "tpdo_n"):
             value = str(self.options.get_safe(name))
-            if not value.isdigit():
-                raise ConanInvalidConfiguration(f"{self.ref} option {name} must be a non-negative integer, got '{value}'")
+            if not value.isdigit() or int(value) < 1:
+                raise ConanInvalidConfiguration(f"{self.ref} option {name} must be a positive integer, got '{value}'")
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
