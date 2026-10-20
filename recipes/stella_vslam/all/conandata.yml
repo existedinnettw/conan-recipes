@@ -1,0 +1,12 @@
+sources:
+  "0.7.0":
+    stella_vslam:
+      url: "https://github.com/stella-cv/stella_vslam/archive/refs/tags/0.7.0.tar.gz"
+      sha256: "7d4beac649f1f23896b9a0805500126a55739501e899944054816cca4c98b80b"
+    # git submodules at the 0.7.0 tag
+    fbow:
+      url: "https://github.com/stella-cv/FBoW/archive/c6e3c29e3332a0b0834021797e2aa4e8eb66a3c1.tar.gz"
+      sha256: "0287d5466a5ee16e31c974bf78c02d25888e9cf4db5b4fac681bd09f822b5349"
+    tinycolormap:
+      url: "https://github.com/yuki-koyama/tinycolormap/archive/67198d2b2b48ca5e97600c83b5c0f2310cfd4c03.tar.gz"
+      sha256: "ecf8f4c6f07992b1cd629e73e0c24e5b6039b8bc2fcd1431ba36207042d76256"
