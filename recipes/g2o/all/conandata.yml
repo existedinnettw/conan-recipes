@@ -1,0 +1,4 @@
+sources:
+  "20230223":
+    url: "https://github.com/RainerKuemmerle/g2o/archive/refs/tags/20230223_git.tar.gz"
+    sha256: "c8cf002f636ce2e83fc96f5e8257be4020cf1ae9f6a9d71838ec024f4d8a16cf"
