@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.15)
+project(test_package LANGUAGES CXX)
+
+find_package(Pangolin REQUIRED CONFIG)
+
+add_executable(${PROJECT_NAME} test_package.cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Pangolin_LIBRARIES})
+if(PANGOLIN_WITH_PNG)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PANGOLIN_WITH_PNG)
+endif()
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

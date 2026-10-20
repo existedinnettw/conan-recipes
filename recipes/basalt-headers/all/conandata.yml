@@ -1,0 +1,5 @@
+sources:
+  # Pinned by basalt 0.1.7's vcpkg overlay port (vcpkg/ports/basalt-headers).
+  "cci.20260228":
+    url: "https://gitlab.com/VladyslavUsenko/basalt-headers/-/archive/aa441ba3e51050c47ba1902537792a2e4db7e43d/basalt-headers-aa441ba3e51050c47ba1902537792a2e4db7e43d.tar.gz"
+    sha256: "0024bf2601bd8c16ff6e073ae4f33e4907a081fe4e5e9cbd59344686afaaa766"
