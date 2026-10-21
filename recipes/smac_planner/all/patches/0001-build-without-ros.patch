@@ -1,0 +1,597 @@
+diff --git a/include/smac_planner/collision_checker.hpp b/include/smac_planner/collision_checker.hpp
+index 34001a9..718be86 100644
+--- a/include/smac_planner/collision_checker.hpp
++++ b/include/smac_planner/collision_checker.hpp
+@@ -16,7 +16,8 @@
+ #include <memory>
+ 
+ #include "base_local_planner/costmap_model.h"
+-#include "costmap_2d/costmap_2d_ros.h"
++#include "costmap_2d/costmap_2d.h"
++#include "costmap_2d/footprint.h"
+ #include "smac_planner/constants.hpp"
+ 
+ #ifndef SMAC_PLANNER__COLLISION_CHECKER_HPP_
+@@ -40,9 +41,10 @@ public:
+    * @param costmap The costmap to collision check against
+    * @param num_quantizations The number of quantizations to precompute footprint
+    * orientations for to speed up collision checking
++   * The footprint must be given with setFootprint().
+    */
+   GridCollisionChecker(
+-    std::shared_ptr<costmap_2d::Costmap2DROS> costmap,
++    costmap_2d::Costmap2D * costmap,
+     unsigned int num_quantizations);
+ 
+   /**
+@@ -108,10 +110,10 @@ public:
+   }
+ 
+   /**
+-   * @brief Get costmap ros object for inflation layer params
+-   * @return Costmap ros
++   * @brief Get the full resolution costmap given to the constructor, used for the obstacle heuristic
++   * @return Costmap
+    */
+-  std::shared_ptr<costmap_2d::Costmap2DROS> getCostmapROS() {return costmap_ros_;}
++  costmap_2d::Costmap2D * getFullCostmap() {return full_costmap_;}
+ 
+ private:
+   /**
+@@ -125,14 +127,14 @@ private:
+ 
+ protected:
+   std::unique_ptr<base_local_planner::CostmapModel> world_model_;
+-  std::shared_ptr<costmap_2d::Costmap2DROS> costmap_ros_;
+-  costmap_2d::Costmap2D* costmap_;  // this can point to the downsampled costmap instead of the one inside costmap_ros_
++  costmap_2d::Costmap2D* full_costmap_{nullptr};
++  costmap_2d::Costmap2D* costmap_{nullptr};  // this can point to the downsampled costmap instead of full_costmap_
+   std::vector<Footprint> oriented_footprints_;  // footprints oriented for each of the angle bins
+   Footprint unoriented_footprint_;
+   double inscribed_radius_;
+   double circumscribed_radius_;
+   float center_cost_;
+-  bool footprint_is_radius_;
++  bool footprint_is_radius_{true};
+   std::vector<float> angles_;
+   float possible_collision_cost_{-1};
+ };
+diff --git a/include/smac_planner/costmap_downsampler.hpp b/include/smac_planner/costmap_downsampler.hpp
+index 83ce470..c720084 100644
+--- a/include/smac_planner/costmap_downsampler.hpp
++++ b/include/smac_planner/costmap_downsampler.hpp
+@@ -19,7 +19,7 @@
+ #include <string>
+ #include <memory>
+ 
+-#include "costmap_2d/costmap_2d_ros.h"
++#include "costmap_2d/costmap_2d.h"
+ #include "smac_planner/constants.hpp"
+ 
+ namespace smac_planner
+@@ -43,38 +43,23 @@ public:
+   ~CostmapDownsampler();
+ 
+   /**
+-   * @brief Configure the downsampled costmap object and the ROS publisher
+-   * @param node Lifecycle node pointer
+-   * @param global_frame The ID of the global frame used by the costmap
+-   * @param topic_name The name of the topic to publish the downsampled costmap
++   * @brief Configure the downsampled costmap object
+    * @param costmap The costmap we want to downsample
+    * @param downsampling_factor Multiplier for the costmap resolution
+    * @param use_min_cost_neighbor If true, min function is used instead of max for downsampling
+    */
+   void on_configure(
+-    const std::string & global_frame,
+-    const std::string & topic_name,
+     costmap_2d::Costmap2D * const costmap,
+     const unsigned int & downsampling_factor,
+     const bool & use_min_cost_neighbor = false);
+ 
+   /**
+-   * @brief Activate the publisher of the downsampled costmap
+-   */
+-  void on_activate();
+-
+-  /**
+-   * @brief Deactivate the publisher of the downsampled costmap
+-   */
+-  void on_deactivate();
+-
+-  /**
+-   * @brief Cleanup the publisher of the downsampled costmap
++   * @brief Release the downsampled costmap
+    */
+   void on_cleanup();
+ 
+   /**
+-   * @brief Downsample the given costmap by the downsampling factor, and publish the downsampled costmap
++   * @brief Downsample the given costmap by the downsampling factor
+    * @param downsampling_factor Multiplier for the costmap resolution
+    * @return A ptr to the downsampled costmap
+    */
+@@ -107,10 +92,8 @@ protected:
+   unsigned int _downsampling_factor;
+   bool _use_min_cost_neighbor;
+   float _downsampled_resolution;
+-  ros::NodeHandle _pnh;
+   costmap_2d::Costmap2D * _costmap;
+   std::unique_ptr<costmap_2d::Costmap2D> _downsampled_costmap;
+-  std::unique_ptr<costmap_2d::Costmap2DPublisher> _downsampled_costmap_pub;
+ };
+ 
+ }  // namespace smac_planner
+diff --git a/include/smac_planner/node_hybrid.hpp b/include/smac_planner/node_hybrid.hpp
+index cbfe438..fcf75ed 100644
+--- a/include/smac_planner/node_hybrid.hpp
++++ b/include/smac_planner/node_hybrid.hpp
+@@ -32,8 +32,6 @@
+ #include "smac_planner/types.hpp"
+ #include "smac_planner/collision_checker.hpp"
+ #include "smac_planner/costmap_downsampler.hpp"
+-#include "costmap_2d/costmap_2d_ros.h"
+-#include "costmap_2d/inflation_layer.h"
+ 
+ namespace smac_planner
+ {
+@@ -430,11 +428,11 @@ public:
+ 
+   /**
+    * @brief reset the obstacle heuristic state
+-   * @param costmap_ros Costmap to use
++   * @param costmap Costmap to use
+    * @param goal_coords Coordinates to start heuristic expansion at
+    */
+   static void resetObstacleHeuristic(
+-    const std::shared_ptr<costmap_2d::Costmap2DROS>& costmap_ros,
++    costmap_2d::Costmap2D * costmap,
+     const unsigned int & start_x, const unsigned int & start_y,
+     const unsigned int & goal_x, const unsigned int & goal_y);
+ 
+@@ -468,7 +466,7 @@ public:
+   static LookupTable obstacle_heuristic_lookup_table;
+   static ObstacleHeuristicQueue obstacle_heuristic_queue;
+ 
+-  static costmap_2d::Costmap2DROS* costmap_ros;
++  static costmap_2d::Costmap2D* obstacle_heuristic_costmap;
+   // Dubin / Reeds-Shepp lookup and size for dereferencing
+   static LookupTable dist_heuristic_lookup_table;
+   static float size_lookup;
+diff --git a/include/smac_planner/node_lattice.hpp b/include/smac_planner/node_lattice.hpp
+index 95fe3f5..21dfe8a 100644
+--- a/include/smac_planner/node_lattice.hpp
++++ b/include/smac_planner/node_lattice.hpp
+@@ -353,12 +353,12 @@ public:
+    * @param goal_coords Coordinates to start heuristic expansion at
+    */
+   static void resetObstacleHeuristic(
+-    std::shared_ptr<costmap_2d::Costmap2DROS> costmap_ros,
++    costmap_2d::Costmap2D * costmap,
+     const unsigned int & start_x, const unsigned int & start_y,
+     const unsigned int & goal_x, const unsigned int & goal_y)
+   {
+     // State Lattice and Hybrid-A* share this heuristics
+-    NodeHybrid::resetObstacleHeuristic(costmap_ros, start_x, start_y, goal_x, goal_y);
++    NodeHybrid::resetObstacleHeuristic(costmap, start_x, start_y, goal_x, goal_y);
+   }
+ 
+   /**
+diff --git a/include/smac_planner/smoother.hpp b/include/smac_planner/smoother.hpp
+index bb47018..2720899 100644
+--- a/include/smac_planner/smoother.hpp
++++ b/include/smac_planner/smoother.hpp
+@@ -23,10 +23,9 @@
+ #include <utility>
+ 
+ #include "costmap_2d/costmap_2d.h"
+-#include <dynamic_reconfigure/server.h>
++#include <ros/ros.h>
+ #include "smac_planner/types.hpp"
+ #include "smac_planner/constants.hpp"
+-#include "smac_planner/SmootherConfig.h"
+ #include "nav_msgs/Path.h"
+ #include "angles/angles.h"
+ #include "tf2/utils.h"
+@@ -36,6 +35,21 @@
+ namespace smac_planner
+ {
+ 
++/**
++ * @struct smac_planner::SmootherParams
++ * @brief Smoother parameters, with the defaults of cfg/Smoother.cfg
++ */
++struct SmootherParams
++{
++  double tolerance{1e-10};
++  int max_iterations{1000};
++  double w_data{0.2};
++  double w_smooth{0.3};
++  bool do_refinement{true};
++  int refinement_num{2};
++  bool holonomic{false};
++};
++
+ /**
+  * @class smac_planner::PathSegment
+  * @brief A segment of a path in start/end indices
+@@ -100,13 +114,12 @@ public:
+ 
+   /**
+    * @brief Initialization of the smoother
+-   * @param parent_nh Parent planner private namespace
++   * @param params Smoother parameters
+    */
+-  void initialize(ros::NodeHandle& parent_nh);
++  void initialize(const SmootherParams & params = SmootherParams());
+ 
+   void setMinTurningRadius(const double & min_turning_radius);
+ 
+-  void reconfigureCB(SmootherConfig& config, uint32_t level);
+ 
+   /**
+    * @brief Smoother API method
+@@ -234,7 +247,6 @@ protected:
+     nav_msgs::Path & path,
+     bool & reversing_segment);
+ 
+-  std::unique_ptr<dynamic_reconfigure::Server<SmootherConfig>> dsrv_;
+   double min_turning_rad_, tolerance_, data_w_, smooth_w_;
+   int max_its_, refinement_ctr_, refinement_num_;
+   bool is_holonomic_, do_refinement_;
+diff --git a/include/smac_planner/utils.hpp b/include/smac_planner/utils.hpp
+index df68bb7..565e227 100644
+--- a/include/smac_planner/utils.hpp
++++ b/include/smac_planner/utils.hpp
+@@ -26,9 +26,8 @@
+ #include "geometry_msgs/Quaternion.h"
+ #include "geometry_msgs/Pose.h"
+ #include "tf2/utils.h"
+-#include "costmap_2d/costmap_2d_ros.h"
+-#include "costmap_2d/inflation_layer.h"
+-#include "visualization_msgs/MarkerArray.h"
++#include "costmap_2d/costmap_2d.h"
++#include "costmap_2d/cost_values.h"
+ #include "smac_planner/types.hpp"
+ #include <ros/ros.h>
+ 
+@@ -82,39 +81,6 @@ public:
+       return (dot < 0);
+     }
+ 
+-    /**
+-    * @brief Publish an arrow marker at a given pose for debugging
+-    * @param marker_publisher ros::Publisher object
+-    * @param pose the pose where to publish the arrow marker
+-    * @param marker_namespace the namespace to group the marker
+-    * @return
+-    */
+-    static inline void publishArrowMarker(const ros::Publisher &marker_publisher, const geometry_msgs::PoseStamped &pose, const std::string &marker_namespace, const int &id){
+-      if (marker_publisher.getNumSubscribers() < 1) {
+-        return;
+-      }
+-
+-      visualization_msgs::Marker marker;
+-      marker.header = pose.header;
+-      marker.header.frame_id = marker.header.frame_id.empty() ? "map" : marker.header.frame_id;
+-      marker.ns = marker_namespace;
+-      marker.id = id;
+-      marker.type = visualization_msgs::Marker::ARROW;
+-      marker.action = visualization_msgs::Marker::ADD;
+-      marker.pose = pose.pose;
+-
+-      // set scale and color
+-      marker.scale.x = 0.4;
+-      marker.scale.y = 0.035;
+-      marker.scale.z = 0.1;
+-      marker.color.a = 0.5;
+-      marker.color.r = 0.0;
+-      marker.color.g = 0.0;
+-      marker.color.b = 1.0;
+-
+-      marker_publisher.publish(marker);
+-    }
+-
+   /**
+   * @brief Check if the input poses are within specified tolerance
+   * @return Bool true they are under tolerance, false means they are not in tolerance
+@@ -216,58 +182,28 @@ public:
+     return tf2::toMsg(q);
+   }
+ 
+-  static inline std::string inflation_layer_name;
+-
+-  /**
+-   * @brief Find and return the costmap's inflation layer. If inflation_layer_name is not
+-   * provided, we return the first layer that can be casted to costmap_2d::InflationLayer.
+-   * @param costmap Pointer to the global costmap.
+-   * @return Pointer to the inflation layer or nullptr if not found.
+-   */
+-  static inline costmap_2d::InflationLayer *findInflationLayer(costmap_2d::Costmap2DROS *costmap) {
+-    if (inflation_layer_name.empty()) {
+-      ROS_WARN_ONCE("Inflation layer name not provided");
+-      ROS_WARN_ONCE("We will use the first layer that can be casted to costmap_2d::InflationLayer");
+-    }
+-
+-    for (auto layer = costmap->getLayeredCostmap()->getPlugins()->begin();
+-         layer != costmap->getLayeredCostmap()->getPlugins()->end(); ++layer) {
+-      auto inflation_layer = boost::dynamic_pointer_cast<costmap_2d::InflationLayer>(*layer);
+-      if (inflation_layer && (inflation_layer_name.empty() || inflation_layer->getName() == inflation_layer_name)) {
+-        if (inflation_layer_name.empty()) {
+-          ROS_INFO_STREAM_ONCE("Using " << inflation_layer->getName() << " as inflation layer");
+-        }
+-        return inflation_layer.get();
+-      }
+-    }
+-    return nullptr;
+-  }
+-
+   /**
+   * @brief Find the min cost of the inflation decay function for which the robot MAY be
+-  * in collision in any orientation
+-  * @param costmap Costmap2DROS to get minimum inscribed cost (e.g. 128 in inflation layer documentation)
++  * in collision in any orientation, as costmap_2d::InflationLayer::computeCost() gives it
++  * @param circumscribed_radius Circumscribed radius of the footprint, in meters
++  * @param inscribed_radius Inscribed radius of the footprint, in meters
++  * @param cost_scaling_factor Exponential decay rate of the inflation layer
+   * @return double circumscribed cost, any higher than this and need to do full footprint collision checking
+   * since some element of the robot could be in collision
+   */
+-  static inline double findCircumscribedCost(costmap_2d::Costmap2DROS *costmap) {
+-    double result = -1.0;
+-    std::vector<std::shared_ptr<costmap_2d::Layer>>::iterator layer;
+-
+-    costmap_2d::InflationLayer *inflation_layer = findInflationLayer(costmap);
+-    if (inflation_layer != nullptr) {
+-      double circum_radius = costmap->getLayeredCostmap()->getCircumscribedRadius();
+-      double resolution = costmap->getCostmap()->getResolution();
+-      result = static_cast<double>(inflation_layer->computeCost(circum_radius / resolution));
+-    } else {
+-      ROS_WARN("No inflation layer found in costmap configuration. "
+-               "If this is an SE2-collision checking plugin, it cannot use costmap potential "
+-               "field to speed up collision checking by only checking the full footprint "
+-               "when robot is within possibly-inscribed radius of an obstacle. This may "
+-               "significantly slow down planning times!");
++  static inline double findCircumscribedCost(
++    const double & circumscribed_radius,
++    const double & inscribed_radius,
++    const double & cost_scaling_factor)
++  {
++    if (circumscribed_radius == 0.0) {
++      return costmap_2d::LETHAL_OBSTACLE;
+     }
+-
+-    return result;
++    if (circumscribed_radius <= inscribed_radius) {
++      return costmap_2d::INSCRIBED_INFLATED_OBSTACLE;
++    }
++    const double factor = std::exp(-1.0 * cost_scaling_factor * (circumscribed_radius - inscribed_radius));
++    return static_cast<unsigned char>((costmap_2d::INSCRIBED_INFLATED_OBSTACLE - 1) * factor);
+   }
+ 
+   /**
+@@ -345,35 +281,6 @@ public:
+     }
+     return out_footprint;
+   }
+-
+-  /**
+-   * @brief initializes marker to visualize shape of linestring
+-   * @param edge       edge to mark of footprint
+-   * @param i          marker ID
+-   * @param frame_id   frame of the marker
+-   * @param timestamp  timestamp of the marker
+-   * @return marker populated
+-   */
+-  static inline visualization_msgs::Marker createMarker(
+-      const std::vector<geometry_msgs::Point>& edge,
+-      unsigned int i, const std::string &frame_id, const ros::Time &timestamp) {
+-    visualization_msgs::Marker marker;
+-    marker.header.frame_id = frame_id;
+-    marker.header.stamp = timestamp;
+-    marker.frame_locked = false;
+-    marker.id = i;
+-    marker.ns = "planned_footprint";
+-    marker.action = visualization_msgs::Marker::ADD;
+-    marker.type = visualization_msgs::Marker::LINE_LIST;
+-    marker.lifetime = ros::Duration(0, 0);
+-    marker.points = edge;
+-    marker.pose.orientation.w = 1.0;
+-    marker.scale.x = 0.01;
+-    marker.color.r = 0.8f;
+-    marker.color.g = 0.6f;
+-    marker.color.a = 0.8f;
+-    return marker;
+-  }
+ };
+ 
+ }  // namespace smac_planner
+diff --git a/src/a_star.cpp b/src/a_star.cpp
+index 4002c61..3b94311 100644
+--- a/src/a_star.cpp
++++ b/src/a_star.cpp
+@@ -13,7 +13,6 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License. Reserved.
+ 
+-#include <omp.h>
+ #include <cmath>
+ #include <stdexcept>
+ #include <memory>
+@@ -260,7 +259,7 @@ void AStarAlgorithm<NodeT>::setGoal(
+     }
+ 
+     NodeT::resetObstacleHeuristic(
+-      _collision_checker->getCostmapROS(), _start->pose.x, _start->pose.y, mx, my);
++      _collision_checker->getFullCostmap(), _start->pose.x, _start->pose.y, mx, my);
+   }
+ 
+   _goal_coordinates = goal_coords;
+diff --git a/src/collision_checker.cpp b/src/collision_checker.cpp
+index be5fe11..3ab8635 100644
+--- a/src/collision_checker.cpp
++++ b/src/collision_checker.cpp
+@@ -20,7 +20,7 @@ namespace smac_planner
+ {
+ 
+ GridCollisionChecker::GridCollisionChecker(
+-  std::shared_ptr<costmap_2d::Costmap2DROS> costmap_ros,
++  costmap_2d::Costmap2D * costmap,
+   unsigned int num_quantizations)
+ {
+   // Convert number of regular bins into angles
+@@ -31,12 +31,9 @@ GridCollisionChecker::GridCollisionChecker(
+     angles_.push_back(bin_size * i);
+   }
+ 
+-  if (costmap_ros) {
+-    costmap_ros_ = costmap_ros;
+-    setFootprint(
+-        costmap_ros_->getRobotFootprint(),
+-        costmap_ros_->getUseRadius(),
+-        Utils::findCircumscribedCost(costmap_ros_.get()));
++  if (costmap) {
++    full_costmap_ = costmap;
++    setCostmap(costmap);
+   }
+ }
+ 
+diff --git a/src/costmap_downsampler.cpp b/src/costmap_downsampler.cpp
+index 225fc25..c798f9a 100644
+--- a/src/costmap_downsampler.cpp
++++ b/src/costmap_downsampler.cpp
+@@ -23,10 +23,8 @@ namespace smac_planner
+ {
+ 
+ CostmapDownsampler::CostmapDownsampler()
+-: _pnh("~"),
+-  _costmap(nullptr),
+-  _downsampled_costmap(nullptr),
+-  _downsampled_costmap_pub(nullptr)
++: _costmap(nullptr),
++  _downsampled_costmap(nullptr)
+ {
+ }
+ 
+@@ -35,8 +33,6 @@ CostmapDownsampler::~CostmapDownsampler()
+ }
+ 
+ void CostmapDownsampler::on_configure(
+-  const std::string & global_frame,
+-  const std::string & topic_name,
+   costmap_2d::Costmap2D * const costmap,
+   const unsigned int & downsampling_factor,
+   const bool & use_min_cost_neighbor)
+@@ -49,16 +45,12 @@ void CostmapDownsampler::on_configure(
+   _downsampled_costmap = std::make_unique<costmap_2d::Costmap2D>(
+     _downsampled_size_x, _downsampled_size_y, _downsampled_resolution,
+     _costmap->getOriginX(), _costmap->getOriginY(), UNKNOWN);
+-
+-  _downsampled_costmap_pub = std::make_unique<costmap_2d::Costmap2DPublisher>(
+-    &_pnh, _downsampled_costmap.get(), global_frame, topic_name, true);
+ }
+ 
+ void CostmapDownsampler::on_cleanup()
+ {
+   _costmap = nullptr;
+   _downsampled_costmap.reset();
+-  _downsampled_costmap_pub.reset();
+ }
+ 
+ costmap_2d::Costmap2D * CostmapDownsampler::downsample(
+@@ -82,9 +74,6 @@ costmap_2d::Costmap2D * CostmapDownsampler::downsample(
+     }
+   }
+ 
+-  if (_downsampled_costmap_pub) {
+-    _downsampled_costmap_pub->publishCostmap();
+-  }
+   return _downsampled_costmap.get();
+ }
+ 
+diff --git a/src/node_hybrid.cpp b/src/node_hybrid.cpp
+index 1791c33..40cccdd 100644
+--- a/src/node_hybrid.cpp
++++ b/src/node_hybrid.cpp
+@@ -37,7 +37,7 @@ float NodeHybrid::travel_distance_cost = sqrtf(2.0f);
+ HybridMotionTable NodeHybrid::motion_table;
+ float NodeHybrid::size_lookup = 25;
+ LookupTable NodeHybrid::dist_heuristic_lookup_table;
+-costmap_2d::Costmap2DROS* NodeHybrid::costmap_ros = nullptr;
++costmap_2d::Costmap2D* NodeHybrid::obstacle_heuristic_costmap = nullptr;
+ 
+ ObstacleHeuristicQueue NodeHybrid::obstacle_heuristic_queue;
+ 
+@@ -495,7 +495,7 @@ bool NodeHybrid::arePosesSameDiscreteState(
+ }
+ 
+ void NodeHybrid::resetObstacleHeuristic(
+-  const std::shared_ptr<costmap_2d::Costmap2DROS> & costmap_ros_i,
++  costmap_2d::Costmap2D * costmap_i,
+   const unsigned int & start_x, const unsigned int & start_y,
+   const unsigned int & goal_x, const unsigned int & goal_y)
+ {
+@@ -503,8 +503,8 @@ void NodeHybrid::resetObstacleHeuristic(
+   // the planner considerably to search through 75% less cells with no detectable
+   // erosion of path quality after even modest smoothing. The error would be no more
+   // than 0.05 * normalized cost. Since this is just a search prior, there's no loss in generality
+-  costmap_ros = costmap_ros_i.get();
+-  auto costmap = costmap_ros->getCostmap();
++  obstacle_heuristic_costmap = costmap_i;
++  auto costmap = obstacle_heuristic_costmap;
+ 
+   // Clear lookup table
+   unsigned int size = 0u;
+@@ -556,7 +556,7 @@ float NodeHybrid::getObstacleHeuristic(
+   const float & cost_penalty)
+ {
+   // If already expanded, return the cost
+-  auto costmap = costmap_ros->getCostmap();
++  auto costmap = obstacle_heuristic_costmap;
+   unsigned int size_x = 0u;
+   unsigned int size_y = 0u;
+   if (motion_table.downsample_obstacle_heuristic) {
+diff --git a/src/smoother.cpp b/src/smoother.cpp
+index f1b84d8..bb740dc 100644
+--- a/src/smoother.cpp
++++ b/src/smoother.cpp
+@@ -23,13 +23,18 @@ namespace smac_planner
+ {
+ Smoother::Smoother()
+ {
++  initialize();
+ }
+ 
+-void Smoother::initialize(ros::NodeHandle& parent_nh)
++void Smoother::initialize(const SmootherParams & params)
+ {
+-  ros::NodeHandle pnh(parent_nh, "path_smoother");
+-  dsrv_ = std::make_unique<dynamic_reconfigure::Server<SmootherConfig>>(pnh);
+-  dsrv_->setCallback(boost::bind(&Smoother::reconfigureCB, this, _1, _2));
++  tolerance_ = params.tolerance;
++  max_its_ = params.max_iterations;
++  data_w_ = params.w_data;
++  smooth_w_ = params.w_smooth;
++  do_refinement_ = params.do_refinement;
++  refinement_num_ = params.refinement_num;
++  is_holonomic_ = params.holonomic;
+ }
+ 
+ void Smoother::setMinTurningRadius(const double &min_turning_radius)
+@@ -38,16 +43,6 @@ void Smoother::setMinTurningRadius(const double &min_turning_radius)
+   state_space_ = std::make_unique<ompl::base::DubinsStateSpace>(min_turning_rad_);
+ }
+ 
+-void Smoother::reconfigureCB(SmootherConfig& config, uint32_t level)
+-{
+-  tolerance_ = config.tolerance;
+-  max_its_ = config.max_iterations;
+-  data_w_ = config.w_data;
+-  smooth_w_ = config.w_smooth;
+-  do_refinement_ = config.do_refinement;
+-  refinement_num_ = config.refinement_num;
+-}
+-
+ bool Smoother::smooth(
+   nav_msgs::Path & path,
+   const costmap_2d::Costmap2D * costmap,
