@@ -1,0 +1,19 @@
+sources:
+  # karlkurzer/path_planner has no tag since v2.1 (2016); master at 2026-03-29.
+  "cci.20260329":
+    url: "https://github.com/karlkurzer/path_planner/archive/ddf1a3afcafc323ef44d5e49d5cbb7b3c3f53665.tar.gz"
+    sha256: "387572dd9e3ec3180c38b6ad24614bcea73ef995ed78462cd63552ea873a3fe3"
+patches:
+  "cci.20260329":
+    - patch_file: "patches/0001-build-without-ros.patch"
+      patch_description: >-
+        Drop the RViz Visualize argument of the search and its ros::Duration
+        delays, and give CollisionDetection a plain OccupancyGrid in place of
+        nav_msgs::OccupancyGrid, so the algorithm builds without ROS.
+      patch_type: "portability"
+    - patch_file: "patches/0002-smoother-voronoi-double-free.patch"
+      patch_description: >-
+        Keep a pointer to the DynamicVoronoi given to Smoother::smoothPath()
+        instead of a shallow copy, which freed the diagram's arrays a second
+        time when the Smoother was destroyed.
+      patch_type: "bugfix"
