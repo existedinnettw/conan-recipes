@@ -1,0 +1,46 @@
+diff --git a/include/smoother.h b/include/smoother.h
+index 2b4de4e..6663dad 100644
+--- a/include/smoother.h
++++ b/include/smoother.h
+@@ -78,8 +78,8 @@ class Smoother {
+   float wCurvature = 0.1;
+   /// weight for the smoothness term
+   float wSmoothness = 0.2;
+-  /// voronoi diagram describing the topology of the map
+-  DynamicVoronoi voronoi;
++  /// voronoi diagram describing the topology of the map, owned by the caller of smoothPath()
++  const DynamicVoronoi* voronoi = nullptr;
+   /// width of the map
+   int width;
+   /// height of the map
+diff --git a/src/smoother.cpp b/src/smoother.cpp
+index ff7becf..13d2d41 100644
+--- a/src/smoother.cpp
++++ b/src/smoother.cpp
+@@ -17,7 +17,7 @@ inline bool isCusp(const std::vector<Node3D>& path, int i) {
+ //###################################################
+ void Smoother::smoothPath(DynamicVoronoi& voronoi) {
+   // load the current voronoi diagram into the smoother
+-  this->voronoi = voronoi;
++  this->voronoi = &voronoi;
+   this->width = voronoi.getSizeX();
+   this->height = voronoi.getSizeY();
+   // current number of iterations of the gradient descent smoother
+@@ -98,14 +98,14 @@ void Smoother::tracePath(const Node3D* node, int i, std::vector<Node3D> path) {
+ Vector2D Smoother::obstacleTerm(Vector2D xi) {
+   Vector2D gradient;
+   // the distance to the closest obstacle from the current node
+-  float obsDst = voronoi.getDistance(xi.getX(), xi.getY());
++  float obsDst = voronoi->getDistance(xi.getX(), xi.getY());
+   // the vector determining where the obstacle is
+   int x = (int)xi.getX();
+   int y = (int)xi.getY();
+   // if the node is within the map
+   if (x < width && x >= 0 && y < height && y >= 0) {
+-    Vector2D obsVct(xi.getX() - voronoi.data[(int)xi.getX()][(int)xi.getY()].obstX,
+-                    xi.getY() - voronoi.data[(int)xi.getX()][(int)xi.getY()].obstY);
++    Vector2D obsVct(xi.getX() - voronoi->data[(int)xi.getX()][(int)xi.getY()].obstX,
++                    xi.getY() - voronoi->data[(int)xi.getX()][(int)xi.getY()].obstY);
+ 
+     // the closest obstacle is closer than desired correct the path for that
+     if (obsDst < obsDMax) {

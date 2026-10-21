@@ -1,0 +1,22 @@
+sources:
+  # rapyuta-robotics/smac_planner has no tags; master at 2026-09-03.
+  "cci.20260903":
+    smac_planner:
+      url: "https://github.com/rapyuta-robotics/smac_planner/archive/7a897f0b025edaea7415966a0313db610516243f.tar.gz"
+      sha256: "7190841b3e7810ad877552779b0e916c751d0d326c8bed486bed5452bb278fd5"
+    # costmap_2d::Costmap2D and base_local_planner::CostmapModel, which the
+    # planning code uses directly; rapyuta-robotics' ROS navigation fork (devel,
+    # 2025-08-22), which adds the Costmap2D::getCost(index) the code calls.
+    navigation:
+      url: "https://github.com/rapyuta-robotics/navigation/archive/410f54e0127e3d0402e793bcd93e97b02c082b4b.tar.gz"
+      sha256: "c14fb5b2d294746b133ced3e7cd35d821f70a9f99aa38f60b2e6498565839bde"
+patches:
+  "cci.20260903":
+    - patch_file: "patches/0001-build-without-ros.patch"
+      patch_description: >-
+        Give GridCollisionChecker and the obstacle heuristic a costmap_2d::Costmap2D
+        instead of a Costmap2DROS (the footprint is set with setFootprint(), and
+        Utils::findCircumscribedCost() takes the inflation parameters), drop the
+        downsampled costmap publisher and the RViz marker helpers, and configure
+        the Smoother with a SmootherParams struct instead of dynamic_reconfigure.
+      patch_type: "portability"
