@@ -1,0 +1,14 @@
+sources:
+  "2.1.1":
+    fields2cover:
+      url: "https://github.com/Fields2Cover/Fields2Cover/archive/f9bb64a20185150b3d5a54d52ac2c92d172309f0.tar.gz"
+      sha256: "564d1093f6861d4e6150dc5db8956f9dca42d4f17ebc021b32f0c3bb05a0a044"
+    steering_functions:
+      url: "https://github.com/Fields2Cover/steering_functions/archive/13e3f5658144b3832fb1eb31a0e2f5a3cbf57db9.tar.gz"
+      sha256: "19b06ba133c95232a7407032f9ed794dca98d4ce6d1122e434f00a6d9a07ae0a"
+    matplotplusplus:
+      url: "https://github.com/alandefreitas/matplotplusplus/archive/5d01eb3695b07634a2b6642fd423740dea9b026c.tar.gz"
+      sha256: "839498e6e2fef5e588476fe28cb9e671f82b1777c90fbb6ef9de641951754cb6"
+    nlohmann_json:
+      url: "https://github.com/nlohmann/json/archive/4424a0fcc1c7fa640b5c87d26776d99150dacd10.tar.gz"
+      sha256: "93adda79eb21e730fb34fc02511db263cf397d4587157e95ff83f42ad60569bf"
