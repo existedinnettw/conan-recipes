@@ -1,0 +1,5 @@
+# One argument per line, appended to `conan create` by the CI/CD workflows.
+# openusd 26.08 does not compile as C++23 (make_unique of the incomplete Tf_MallocPathNode
+# in mallocTag.cpp); usd-brep itself still builds as the profile's C++23.
+-s
+openusd/*:compiler.cppstd=17
