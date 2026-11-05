@@ -31,7 +31,7 @@ board selection, Kconfig, devicetree, MCUboot, signing and flashing.
   `west update` inside the package will not work.
 
 The SDK major version must match the Zephyr release: Zephyr 4.3 wants SDK
-0.17.x, Zephyr 4.4 wants SDK 1.0.x.
+0.17.x, Zephyr 4.4 and 4.5 want SDK 1.0.x.
 
 ## Options
 
@@ -49,7 +49,7 @@ Zephyr is compiled into the firmware, so consumers declare it with
 `requires` (host context) and options are passed with plain `-o`:
 
 ```bash
-conan create recipes/zephyr/all --version=4.4.0 \
+conan create recipes/zephyr/all --version=4.5.0 \
     -o "zephyr/*:projects=hal_stm32,cmsis_6,mcuboot"
 ```
 
@@ -63,7 +63,7 @@ class Firmware(ConanFile):
     generators = "VirtualBuildEnv"
 
     def requirements(self):
-        self.requires("zephyr/4.4.0")            # platform source, compiled into the image
+        self.requires("zephyr/4.5.0")            # platform source, compiled into the image
 
     def build_requirements(self):
         self.tool_requires("zephyr-sdk/1.0.1")   # toolchains, see recipes/zephyr-sdk

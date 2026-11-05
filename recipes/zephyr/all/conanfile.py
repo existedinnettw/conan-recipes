@@ -25,7 +25,7 @@ class ZephyrConan(ConanFile):
     Consume it as an ordinary requirement (it ends up compiled into the firmware)::
 
         def requirements(self):
-            self.requires("zephyr/4.4.0")
+            self.requires("zephyr/4.5.0")
 
     which exports ``ZEPHYR_BASE`` into the build environment, so an ordinary
     ``west build -b <board> <app>`` works from any directory.
