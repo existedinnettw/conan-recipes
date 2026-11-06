@@ -5,3 +5,7 @@ sources:
   "4.1":
     url: "https://github.com/CANopenNode/CANopenNode/archive/refs/tags/v4.1.tar.gz"
     sha256: "c48bfb5a5205bf745d77b837be8d1c819cc8fe0e812b3b6fc1fda0b9641295f8"
+  # existedinnettw/CANopenNode feat/canopen-fd: 4.1 + CANopen FD (CiA 1301), USDO
+  "4.1-fd.20261020":
+    url: "https://github.com/existedinnettw/CANopenNode/archive/8b132bde612a4df3e1675a1e3b1ec1ea2ddadfea.tar.gz"
+    sha256: "e783be76b0df2899ea102607d82ad59ae9686fa19b4641ebd8f8322a245daf31"

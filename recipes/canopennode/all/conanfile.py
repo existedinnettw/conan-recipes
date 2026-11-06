@@ -53,7 +53,7 @@ class CANopenNodeConan(ConanFile):
         save(
             self,
             os.path.join(self.package_folder, "cmake", "CANopenNodeSources.cmake"),
-            self._cmake_sources_module(),
+            self._cmake_sources_module(self.source_folder),
         )
 
     def package_id(self):
@@ -71,8 +71,8 @@ class CANopenNodeConan(ConanFile):
         self.cpp_info.libdirs = []
 
     @staticmethod
-    def _cmake_sources_module():
-        sources = (
+    def _cmake_sources_module(source_folder):
+        sources = [
             "301/CO_Emergency.c",
             "301/CO_fifo.c",
             "301/CO_HBconsumer.c",
@@ -94,7 +94,13 @@ class CANopenNodeConan(ConanFile):
             "CANopen.c",
             "extra/CO_trace.c",
             "storage/CO_storage.c",
-        )
+        ]
+        # CANopen FD (CiA 1301) forks add the USDO server and client
+        sources += [
+            source
+            for source in ("301/CO_USDOclient.c", "301/CO_USDOserver.c")
+            if os.path.isfile(os.path.join(source_folder, source))
+        ]
         source_properties = "\n".join(
             f'    "${{_CANOPENNODE_PACKAGE_ROOT}}/src/{source}"' for source in sources
         )
