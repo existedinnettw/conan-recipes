@@ -9,3 +9,7 @@ sources:
   "4.1-fd.20261020":
     url: "https://github.com/existedinnettw/CANopenNode/archive/8b132bde612a4df3e1675a1e3b1ec1ea2ddadfea.tar.gz"
     sha256: "e783be76b0df2899ea102607d82ad59ae9686fa19b4641ebd8f8322a245daf31"
+  # existedinnettw/CANopenNode feat/canopen-fd: + USDO node-ID collision EMCY, per-node HB error code, abort 0x1D
+  "4.1-fd.20261107":
+    url: "https://github.com/existedinnettw/CANopenNode/archive/74e55e76a760df42a1453ec09a026d40871350a1.tar.gz"
+    sha256: "c22fa5ef0ad172319366414fe12ce13b201cf41f1b803b975cf405a777d4253b"
