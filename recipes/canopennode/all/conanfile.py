@@ -36,7 +36,7 @@ class CANopenNodeConan(ConanFile):
             "*.c",
             src=self.source_folder,
             dst=os.path.join(self.package_folder, "src"),
-            excludes=("example/*",),
+            excludes=("example/*", "test/*"),
         )
         copy(
             self,
@@ -53,7 +53,7 @@ class CANopenNodeConan(ConanFile):
         save(
             self,
             os.path.join(self.package_folder, "cmake", "CANopenNodeSources.cmake"),
-            self._cmake_sources_module(),
+            self._cmake_sources_module(self.source_folder),
         )
 
     def package_id(self):
@@ -71,7 +71,7 @@ class CANopenNodeConan(ConanFile):
         self.cpp_info.libdirs = []
 
     @staticmethod
-    def _cmake_sources_module():
+    def _cmake_sources_module(source_folder):
         sources = (
             "301/CO_Emergency.c",
             "301/CO_fifo.c",
@@ -83,6 +83,8 @@ class CANopenNodeConan(ConanFile):
             "301/CO_SDOclient.c",
             "301/CO_SDOserver.c",
             "301/CO_SYNC.c",
+            "301/CO_USDOclient.c",
+            "301/CO_USDOserver.c",
             "301/CO_TIME.c",
             "301/crc16-ccitt.c",
             "303/CO_LEDs.c",
@@ -95,8 +97,11 @@ class CANopenNodeConan(ConanFile):
             "extra/CO_trace.c",
             "storage/CO_storage.c",
         )
+        # USDO (CANopen FD) sources exist only in newer versions
         source_properties = "\n".join(
-            f'    "${{_CANOPENNODE_PACKAGE_ROOT}}/src/{source}"' for source in sources
+            f'    "${{_CANOPENNODE_PACKAGE_ROOT}}/src/{source}"'
+            for source in sources
+            if os.path.isfile(os.path.join(source_folder, source))
         )
         return f"""\
 if(NOT TARGET CANopenNode::CANopenNode)
