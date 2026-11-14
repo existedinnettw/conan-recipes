@@ -1,0 +1,6 @@
+sources:
+  "3.27.5":
+    url:
+      - "https://download.savannah.gnu.org/releases/gpsd/gpsd-3.27.5.tar.gz"
+      - "https://download-mirror.savannah.gnu.org/releases/gpsd/gpsd-3.27.5.tar.gz"
+    sha256: "409873f5048462ef1ac413a51ab35caa8b50b31be62b3347bee1cc2994e7c649"
