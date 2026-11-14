@@ -1,0 +1,4 @@
+sources:
+  "0.2":
+    url: "https://gitlab.com/chrony/libchrony/-/archive/0.2/libchrony-0.2.tar.gz"
+    sha256: "fce931c6120273b3fb6706221935554e370804e8e9948fc9ccb28d895e83fb7d"
