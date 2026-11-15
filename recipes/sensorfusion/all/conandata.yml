@@ -1,0 +1,10 @@
+sources:
+  "0.2.14":
+    url: "https://codeload.github.com/martinbudden/Library-SensorFusion/tar.gz/refs/tags/0.2.14"
+    filename: "source.tar.gz"
+    sha256: "16f3b7f5bb621965ea6d663c0b0e6cb7e7862f504279d2b44136ff249f95cd51"
+patches:
+  "0.2.14":
+    - patch_file: "patches/0001-public-mahony-constructors.patch"
+      patch_description: "Make MahonyFilter constructors accessible to consumers"
+      patch_type: "bugfix"

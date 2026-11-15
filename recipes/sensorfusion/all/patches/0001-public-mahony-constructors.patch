@@ -1,0 +1,8 @@
+--- a/src/SensorFusion.h
++++ b/src/SensorFusion.h
+@@ -77,4 +77,5 @@
+ */
+ class MahonyFilter : public SensorFusionFilterBase {
++public:
+     MahonyFilter(bool useQuadraticInterpolation, bool useMatrixExponentialApproximation) :
+         _useQuadraticInterpolation(useQuadraticInterpolation),
