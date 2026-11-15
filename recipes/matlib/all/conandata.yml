@@ -1,0 +1,10 @@
+sources:
+  "cci.20231209":
+    url: "https://codeload.github.com/Tellicious/MatLib/tar.gz/4300e9c761ef2bc63c5816b71204434cf76f9aa0"
+    filename: "source.tar.gz"
+    sha256: "5865dc964072b1d189e505b69ff8ca1f0b46797ff6e2edb696b46ec7d3a72cc5"
+patches:
+  "cci.20231209":
+    - patch_file: "patches/0001-standard-cpp-headers-and-constructors.patch"
+      patch_description: "Include required standard headers and use C++20-compatible constructor names"
+      patch_type: "portability"
