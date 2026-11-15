@@ -1,0 +1,5 @@
+sources:
+  "0.4.10":
+    url: "https://codeload.github.com/martinbudden/Library-VectorQuaternionMatrix/tar.gz/refs/tags/0.4.10"
+    filename: "source.tar.gz"
+    sha256: "179c74bd3c47b16347243d28dd5df61a2fa69421c9db5e935a17ce84732efb35"
