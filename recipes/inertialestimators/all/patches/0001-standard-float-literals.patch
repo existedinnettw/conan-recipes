@@ -1,0 +1,34 @@
+--- a/Cpp/src/AHRS_Attitude_SO3.cpp
++++ b/Cpp/src/AHRS_Attitude_SO3.cpp
+@@ -62,10 +62,10 @@
+     _loop_time_s = loop_time_s;
+     
+     // Initialize quaternion
+-    q0 = 1f;
+-    q1 = 0f;
+-    q2 = 0f;
+-    q3 = 0f;
++    q0 = 1.0f;
++    q1 = 0.0f;
++    q2 = 0.0f;
++    q3 = 0.0f;
+     
+     // Auxiliary variables to avoid repeated arithmetic
+     _q0q0 = q0 * q0;
+--- a/Cpp/src/IMU_Madgwick.cpp
++++ b/Cpp/src/IMU_Madgwick.cpp
+@@ -9,10 +9,10 @@
+ //=====================================Constructor===========================================//
+ IMU_Madgwick::IMU_Madgwick(float gyro_error) {
+     // Initial quaternion
+-    q1 = 1f;
+-    q2 = 0f;
+-    q3 = 0f;
+-    q4 = 0f;
++    q1 = 1.0f;
++    q2 = 0.0f;
++    q3 = 0.0f;
++    q4 = 0.0f;
+     // filter parameters
+     _beta = sqrtf(3.0f * 0.25f) * gyro_error;
+ }
